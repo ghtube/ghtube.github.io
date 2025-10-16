@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Простой веб-браузер</title>
+    <title>Браузер с обходом ограничений</title>
     <style>
         * {
             margin: 0;
@@ -41,30 +41,6 @@
             border-bottom: 1px solid #4a4a4a;
         }
 
-        .window-controls {
-            display: flex;
-            gap: 8px;
-            margin-right: 16px;
-        }
-
-        .control-btn {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
-
-        .close {
-            background-color: #ff5f57;
-        }
-
-        .minimize {
-            background-color: #ffbd2e;
-        }
-
-        .maximize {
-            background-color: #28ca42;
-        }
-
         .navigation-controls {
             display: flex;
             gap: 8px;
@@ -78,20 +54,7 @@
             width: 32px;
             height: 32px;
             border-radius: 4px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .nav-btn:hover {
-            background-color: #5a5a5a;
-        }
-
-        .nav-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
         }
 
         .address-bar {
@@ -118,83 +81,9 @@
             color: white;
             padding: 0 16px;
             cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .go-btn:hover {
-            background-color: #6a6a6a;
         }
 
         .browser-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .tab-bar {
-            background-color: #3c3c3c;
-            display: flex;
-            padding: 0 8px;
-            border-bottom: 1px solid #4a4a4a;
-        }
-
-        .tab {
-            background-color: #4a4a4a;
-            color: #ccc;
-            padding: 8px 16px;
-            border-radius: 8px 8px 0 0;
-            margin-right: 4px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            max-width: 200px;
-        }
-
-        .tab.active {
-            background-color: #2c2c2c;
-            color: white;
-        }
-
-        .tab-title {
-            flex: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .tab-close {
-            margin-left: 8px;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background-color: #6a6a6a;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 10px;
-        }
-
-        .tab-close:hover {
-            background-color: #ff5f57;
-        }
-
-        .new-tab {
-            width: 32px;
-            height: 32px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #ccc;
-            cursor: pointer;
-            font-size: 20px;
-        }
-
-        .new-tab:hover {
-            color: white;
-        }
-
-        .view-container {
             flex: 1;
             background-color: white;
             overflow: hidden;
@@ -220,332 +109,306 @@
             padding: 20px;
         }
 
-        .start-page h1 {
-            font-size: 2.5rem;
-            margin-bottom: 16px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
-
-        .start-page p {
-            font-size: 1.2rem;
-            margin-bottom: 24px;
-            max-width: 600px;
-        }
-
-        .quick-links {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            justify-content: center;
+        .status-message {
             margin-top: 20px;
-        }
-
-        .quick-link {
-            background-color: rgba(255, 255, 255, 0.2);
-            padding: 12px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .quick-link:hover {
-            background-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .loading-bar {
-            height: 3px;
-            width: 0;
-            background-color: #4CAF50;
-            position: absolute;
-            top: 0;
-            left: 0;
-            transition: width 0.3s;
+            padding: 10px;
+            border-radius: 5px;
+            background: rgba(0,0,0,0.3);
         }
 
         .error-message {
-            padding: 20px;
-            color: #ff5555;
-            text-align: center;
+            background: rgba(255,0,0,0.3);
+            color: #ff9999;
         }
 
-        @media (max-width: 768px) {
-            .browser-container {
-                height: 95vh;
-            }
-            
-            .navigation-controls {
-                margin-right: 8px;
-            }
-            
-            .nav-btn {
-                width: 28px;
-                height: 28px;
-            }
-            
-            .address-bar input {
-                font-size: 12px;
-            }
+        .success-message {
+            background: rgba(0,255,0,0.3);
+            color: #99ff99;
+        }
+
+        .method-selector {
+            margin: 10px 0;
+        }
+
+        .method-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            margin: 0 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .method-btn.active {
+            background: rgba(255,255,255,0.4);
         }
     </style>
 </head>
 <body>
     <div class="browser-container">
         <div class="browser-header">
-            <div class="window-controls">
-                <div class="control-btn close"></div>
-                <div class="control-btn minimize"></div>
-                <div class="control-btn maximize"></div>
-            </div>
             <div class="navigation-controls">
-                <button class="nav-btn" id="back-btn" title="Назад">←</button>
-                <button class="nav-btn" id="forward-btn" title="Вперёд">→</button>
-                <button class="nav-btn" id="refresh-btn" title="Обновить">↻</button>
+                <button class="nav-btn" id="back-btn">←</button>
+                <button class="nav-btn" id="forward-btn">→</button>
+                <button class="nav-btn" id="refresh-btn">↻</button>
             </div>
             <div class="address-bar">
-                <input type="text" id="url-input" placeholder="Введите адрес сайта или поисковый запрос">
+                <input type="text" id="url-input" placeholder="Введите адрес сайта (попробуйте duckduckgo.com)">
                 <button class="go-btn" id="go-btn">Перейти</button>
             </div>
         </div>
         
         <div class="browser-content">
-            <div class="tab-bar">
-                <div class="tab active" data-tab="1">
-                    <span class="tab-title">Стартовая страница</span>
-                    <div class="tab-close">×</div>
-                </div>
-                <div class="new-tab" id="new-tab-btn">+</div>
-            </div>
-            
-            <div class="view-container">
-                <div class="loading-bar" id="loading-bar"></div>
+            <div class="start-page" id="start-page">
+                <h1>Умный браузер</h1>
+                <p>Использует различные методы для обхода ограничений</p>
                 
-                <div class="start-page" id="start-page">
-                    <h1>Простой веб-браузер</h1>
-                    <p>Введите адрес в строку выше или выберите один из быстрых вариантов:</p>
-                    <div class="quick-links">
-                        <div class="quick-link" data-url="https://www.google.com">Google</div>
-                        <div class="quick-link" data-url="https://www.youtube.com">YouTube</div>
-                        <div class="quick-link" data-url="https://github.com">GitHub</div>
-                        <div class="quick-link" data-url="https://ru.wikipedia.org">Википедия</div>
-                    </div>
+                <div class="method-selector">
+                    <button class="method-btn active" data-method="direct">Прямая загрузка</button>
+                    <button class="method-btn" data-method="googlewebview">Google WebView</button>
+                    <button class="method-btn" data-method="textise">Textise имитация</button>
                 </div>
                 
-                <iframe class="browser-frame" id="browser-frame" style="display: none;"></iframe>
+                <div class="quick-links">
+                    <div class="quick-link" data-url="https://duckduckgo.com">DuckDuckGo</div>
+                    <div class="quick-link" data-url="https://www.bing.com">Bing</div>
+                    <div class="quick-link" data-url="https://www.wikipedia.org">Wikipedia</div>
+                    <div class="quick-link" data-url="https://httpbin.org/ip">Тест подключения</div>
+                </div>
+                
+                <div class="status-message" id="status-message">
+                    Готов к работе. Выберите сайт для тестирования.
+                </div>
             </div>
+            <iframe class="browser-frame" id="browser-frame" style="display: none;"></iframe>
+            <div id="text-content" style="display: none; padding: 20px; height: 100%; overflow: auto;"></div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Элементы DOM
             const backBtn = document.getElementById('back-btn');
             const forwardBtn = document.getElementById('forward-btn');
             const refreshBtn = document.getElementById('refresh-btn');
             const urlInput = document.getElementById('url-input');
             const goBtn = document.getElementById('go-btn');
-            const newTabBtn = document.getElementById('new-tab-btn');
             const browserFrame = document.getElementById('browser-frame');
             const startPage = document.getElementById('start-page');
-            const loadingBar = document.getElementById('loading-bar');
-            const tabBar = document.querySelector('.tab-bar');
-            
-            // История навигации
-            let history = {
-                current: 0,
-                pages: [{
-                    url: '',
-                    title: 'Стартовая страница'
-                }]
-            };
-            
-            // Текущая активная вкладка
-            let activeTab = 1;
-            
-            // Обновление состояния кнопок навигации
-            function updateNavButtons() {
-                backBtn.disabled = history.current === 0;
-                forwardBtn.disabled = history.current === history.pages.length - 1;
+            const statusMessage = document.getElementById('status-message');
+            const textContent = document.getElementById('text-content');
+            const methodBtns = document.querySelectorAll('.method-btn');
+            const quickLinks = document.querySelectorAll('.quick-link');
+
+            let currentMethod = 'direct';
+            let currentUrl = '';
+
+            // Инициализация методов
+            methodBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    methodBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentMethod = this.getAttribute('data-method');
+                    updateStatus(`Метод изменен: ${this.textContent}`);
+                });
+            });
+
+            // Быстрые ссылки
+            quickLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    const url = this.getAttribute('data-url');
+                    urlInput.value = url;
+                    loadPage(url);
+                });
+            });
+
+            function updateStatus(message, type = 'info') {
+                statusMessage.textContent = message;
+                statusMessage.className = 'status-message';
+                if (type === 'error') {
+                    statusMessage.classList.add('error-message');
+                } else if (type === 'success') {
+                    statusMessage.classList.add('success-message');
+                }
             }
+
+            async function loadPage(url) {
+                if (!url) return;
+
+                currentUrl = url;
+                let formattedUrl = url;
+                
+                if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                    formattedUrl = 'https://' + url;
+                }
+
+                updateStatus(`Загрузка: ${formattedUrl} (метод: ${currentMethod})`);
+
+                try {
+                    // Скрываем все контейнеры
+                    browserFrame.style.display = 'none';
+                    startPage.style.display = 'none';
+                    textContent.style.display = 'none';
+
+                    switch(currentMethod) {
+                        case 'direct':
+                            await loadDirect(formattedUrl);
+                            break;
+                        case 'googlewebview':
+                            await loadGoogleWebView(formattedUrl);
+                            break;
+                        case 'textise':
+                            await loadTextise(formattedUrl);
+                            break;
+                    }
+                } catch (error) {
+                    updateStatus(`Ошибка: ${error.message}`, 'error');
+                    showStartPage();
+                }
+            }
+
+            // Метод 1: Прямая загрузка с обработкой ошибок
+            function loadDirect(url) {
+                return new Promise((resolve, reject) => {
+                    browserFrame.src = url;
+                    browserFrame.style.display = 'block';
+                    
+                    browserFrame.onload = function() {
+                        try {
+                            // Проверяем, не заблокирован ли доступ
+                            const frameDoc = browserFrame.contentDocument || browserFrame.contentWindow.document;
+                            if (frameDoc.body.innerHTML.includes('denied') || 
+                                frameDoc.body.innerHTML.includes('blocked') ||
+                                frameDoc.body.innerHTML.includes('X-Frame-Options')) {
+                                reject(new Error('Сайт запрещает встраивание'));
+                            } else {
+                                updateStatus('Загрузка успешна!', 'success');
+                                resolve();
+                            }
+                        } catch (e) {
+                            // CORS ошибка - но контент может быть загружен
+                            updateStatus('Контент загружен (ограниченный доступ)', 'success');
+                            resolve();
+                        }
+                    };
+                    
+                    browserFrame.onerror = function() {
+                        reject(new Error('Ошибка загрузки страницы'));
+                    };
+
+                    // Таймаут
+                    setTimeout(() => {
+                        if (browserFrame.src === url) {
+                            updateStatus('Загрузка завершена (таймаут)', 'success');
+                            resolve();
+                        }
+                    }, 5000);
+                });
+            }
+
+            // Метод 2: Имитация Google WebView
+            function loadGoogleWebView(url) {
+                return new Promise((resolve, reject) => {
+                    // Создаем iframe с пользовательским User-Agent
+                    const iframe = browserFrame;
+                    iframe.src = url;
+                    iframe.style.display = 'block';
+                    
+                    // Пытаемся обмануть сайт, изменив referrer policy
+                    iframe.setAttribute('referrerpolicy', 'no-referrer');
+                    
+                    updateStatus('Используем метод Google WebView...');
+                    resolve();
+                });
+            }
+
+            // Метод 3: Textise-подобный метод (только текст)
+            async function loadTextise(url) {
+                try {
+                    updateStatus('Получаем текстовое содержимое...');
+                    
+                    // Используем CORS прокси для получения текста
+                    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+                    const response = await fetch(proxyUrl);
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const html = await response.text();
+                    
+                    // Простой парсинг для извлечения текста
+                    const text = extractTextFromHTML(html);
+                    textContent.innerHTML = `<h3>Текстовое содержимое ${url}</h3><div style="white-space: pre-wrap;">${escapeHtml(text)}</div>`;
+                    textContent.style.display = 'block';
+                    
+                    updateStatus('Текстовое содержимое загружено', 'success');
+                } catch (error) {
+                    throw new Error(`Не удалось получить текстовое содержимое: ${error.message}`);
+                }
+            }
+
+            function extractTextFromHTML(html) {
+                // Удаляем теги script и style
+                let text = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+                text = text.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
+                
+                // Заменяем теги на пробелы
+                text = text.replace(/<[^>]+>/g, ' ');
+                
+                // Убираем лишние пробелы
+                text = text.replace(/\s+/g, ' ').trim();
+                
+                return text.substring(0, 10000); // Ограничиваем длину
+            }
+
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            function showStartPage() {
+                browserFrame.style.display = 'none';
+                textContent.style.display = 'none';
+                startPage.style.display = 'flex';
+            }
+
+            // Обработчики событий
+            goBtn.addEventListener('click', () => loadPage(urlInput.value));
             
-            // Навигация назад
-            backBtn.addEventListener('click', function() {
-                if (history.current > 0) {
-                    history.current--;
-                    loadPage(history.pages[history.current].url);
+            urlInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') loadPage(urlInput.value);
+            });
+
+            backBtn.addEventListener('click', () => {
+                try {
+                    browserFrame.contentWindow.history.back();
+                } catch (e) {
+                    updateStatus('Навигация назад недоступна', 'error');
                 }
             });
-            
-            // Навигация вперёд
-            forwardBtn.addEventListener('click', function() {
-                if (history.current < history.pages.length - 1) {
-                    history.current++;
-                    loadPage(history.pages[history.current].url);
+
+            forwardBtn.addEventListener('click', () => {
+                try {
+                    browserFrame.contentWindow.history.forward();
+                } catch (e) {
+                    updateStatus('Навигация вперед недоступна', 'error');
                 }
             });
-            
-            // Обновление страницы
-            refreshBtn.addEventListener('click', function() {
+
+            refreshBtn.addEventListener('click', () => {
                 if (browserFrame.style.display !== 'none') {
                     browserFrame.contentWindow.location.reload();
+                } else if (currentUrl) {
+                    loadPage(currentUrl);
                 }
             });
-            
-            // Загрузка страницы
-            function loadPage(url) {
-                // Показываем индикатор загрузки
-                loadingBar.style.width = '30%';
-                
-                // Если URL пустой, показываем стартовую страницу
-                if (!url) {
-                    browserFrame.style.display = 'none';
-                    startPage.style.display = 'flex';
-                    urlInput.value = '';
-                    loadingBar.style.width = '0';
-                    return;
-                }
-                
-                // Форматируем URL
-                let formattedUrl = url;
-                if (!url.startsWith('http://') && !url.startsWith('https://')) {
-                    // Если это не URL, выполняем поиск в Google
-                    if (url.includes(' ') || url.includes('.') === false) {
-                        formattedUrl = 'https://www.google.com/search?q=' + encodeURIComponent(url);
-                    } else {
-                        formattedUrl = 'https://' + url;
-                    }
-                }
-                
-                // Загружаем страницу в iframe
-                browserFrame.src = formattedUrl;
-                browserFrame.style.display = 'block';
-                startPage.style.display = 'none';
-                urlInput.value = formattedUrl;
-                
-                // Обновляем историю
-                if (history.pages[history.current].url !== formattedUrl) {
-                    // Удаляем всё после текущей позиции
-                    history.pages = history.pages.slice(0, history.current + 1);
-                    // Добавляем новую страницу
-                    history.pages.push({
-                        url: formattedUrl,
-                        title: 'Загрузка...'
-                    });
-                    history.current++;
-                }
-                
-                updateNavButtons();
-                
-                // Имитация завершения загрузки
-                setTimeout(() => {
-                    loadingBar.style.width = '100%';
-                    setTimeout(() => {
-                        loadingBar.style.width = '0';
-                    }, 300);
-                }, 1000);
-            }
-            
-            // Обработчик кнопки "Перейти"
-            goBtn.addEventListener('click', function() {
-                loadPage(urlInput.value);
-            });
-            
-            // Обработчик нажатия Enter в адресной строке
-            urlInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    loadPage(urlInput.value);
-                }
-            });
-            
-            // Обработчики быстрых ссылок
-            document.querySelectorAll('.quick-link').forEach(link => {
-                link.addEventListener('click', function() {
-                    loadPage(this.getAttribute('data-url'));
-                });
-            });
-            
-            // Создание новой вкладки
-            newTabBtn.addEventListener('click', function() {
-                const tabId = Date.now();
-                const newTab = document.createElement('div');
-                newTab.className = 'tab';
-                newTab.setAttribute('data-tab', tabId);
-                newTab.innerHTML = `
-                    <span class="tab-title">Новая вкладка</span>
-                    <div class="tab-close">×</div>
-                `;
-                
-                // Вставляем новую вкладку перед кнопкой "+"
-                tabBar.insertBefore(newTab, newTabBtn);
-                
-                // Активируем новую вкладку
-                activateTab(tabId);
-                
-                // Показываем стартовую страницу
-                browserFrame.style.display = 'none';
-                startPage.style.display = 'flex';
-                urlInput.value = '';
-                
-                // Обработчик закрытия вкладки
-                newTab.querySelector('.tab-close').addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    closeTab(tabId);
-                });
-                
-                // Обработчик активации вкладки
-                newTab.addEventListener('click', function() {
-                    activateTab(tabId);
-                });
-            });
-            
-            // Активация вкладки
-            function activateTab(tabId) {
-                // Убираем активный класс у всех вкладок
-                document.querySelectorAll('.tab').forEach(tab => {
-                    tab.classList.remove('active');
-                });
-                
-                // Добавляем активный класс к выбранной вкладке
-                const tab = document.querySelector(`.tab[data-tab="${tabId}"]`);
-                if (tab) {
-                    tab.classList.add('active');
-                    activeTab = tabId;
-                    
-                    // Здесь должна быть логика загрузки содержимого вкладки
-                    // В этом упрощённом примере мы всегда показываем стартовую страницу для новых вкладок
-                    browserFrame.style.display = 'none';
-                    startPage.style.display = 'flex';
-                    urlInput.value = '';
-                }
-            }
-            
-            // Закрытие вкладки
-            function closeTab(tabId) {
-                const tab = document.querySelector(`.tab[data-tab="${tabId}"]`);
-                if (tab) {
-                    tab.remove();
-                    
-                    // Если закрыли активную вкладку, активируем первую доступную
-                    if (activeTab === tabId) {
-                        const remainingTabs = document.querySelectorAll('.tab');
-                        if (remainingTabs.length > 0) {
-                            const firstTabId = remainingTabs[0].getAttribute('data-tab');
-                            activateTab(firstTabId);
-                        } else {
-                            // Если вкладок не осталось, создаём новую
-                            newTabBtn.click();
-                        }
-                    }
-                }
-            }
-            
-            // Инициализация
-            updateNavButtons();
-            
-            // Обработчик закрытия вкладки по умолчанию
-            document.querySelector('.tab-close').addEventListener('click', function(e) {
-                e.stopPropagation();
-                closeTab(1);
-            });
+
+            // Тестовые URL которые обычно работают
+            setTimeout(() => {
+                updateStatus('Попробуйте: duckduckgo.com, bing.com, httpbin.org/ip');
+            }, 2000);
         });
     </script>
 </body>

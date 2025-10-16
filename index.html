@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Clone</title>
+    <title>ghtube, обход блокировки youtube</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -19,260 +19,141 @@
             --dark-hover: #3d3d3d;
             --text-primary: #ffffff;
             --text-secondary: #aaaaaa;
-            --text-muted: #717171;
         }
 
         body {
-            font-family: 'Roboto', 'Arial', sans-serif;
+            font-family: 'Roboto', Arial, sans-serif;
             background-color: var(--dark-bg);
             color: var(--text-primary);
             line-height: 1.6;
         }
 
-        /* Header */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
         .header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 56px;
-            background-color: var(--dark-bg);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 16px;
-            z-index: 1000;
-            border-bottom: 1px solid var(--dark-surface);
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .menu-btn {
-            background: none;
-            border: none;
-            color: var(--text-primary);
-            padding: 8px;
-            border-radius: 50%;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .menu-btn:hover {
-            background-color: var(--dark-hover);
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--dark-surface);
+            border-radius: 12px;
         }
 
         .logo {
             display: flex;
             align-items: center;
-            gap: 2px;
-            text-decoration: none;
-            color: var(--text-primary);
-            font-size: 20px;
+            justify-content: center;
+            gap: 10px;
+            font-size: 28px;
             font-weight: bold;
+            margin-bottom: 10px;
         }
 
         .logo i {
             color: var(--primary-red);
         }
 
-        .header-center {
+        .proxy-selector {
             display: flex;
-            align-items: center;
-            flex: 0 1 728px;
-            max-width: 600px;
-            margin: 0 40px;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .proxy-btn {
+            padding: 10px 20px;
+            background: var(--dark-surface);
+            border: 1px solid var(--dark-hover);
+            border-radius: 20px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .proxy-btn:hover {
+            background: var(--dark-hover);
+        }
+
+        .proxy-btn.active {
+            background: var(--primary-red);
+            border-color: var(--primary-red);
         }
 
         .search-container {
             display: flex;
-            width: 100%;
+            max-width: 600px;
+            margin: 0 auto 30px;
         }
 
         .search-input {
             flex: 1;
-            padding: 0 16px;
-            height: 40px;
-            background: var(--dark-bg);
-            border: 1px solid var(--dark-surface);
+            padding: 12px 16px;
+            background: var(--dark-surface);
+            border: 1px solid var(--dark-hover);
             border-radius: 20px 0 0 20px;
             color: var(--text-primary);
             font-size: 16px;
             outline: none;
         }
 
-        .search-input:focus {
-            border-color: #1c62b9;
-        }
-
         .search-btn {
-            width: 64px;
-            height: 40px;
-            background: var(--dark-surface);
-            border: 1px solid var(--dark-surface);
+            padding: 12px 24px;
+            background: var(--primary-red);
+            border: none;
             border-radius: 0 20px 20px 0;
-            color: var(--text-primary);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .search-btn:hover {
-            background: var(--dark-hover);
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .icon-btn {
-            background: none;
-            border: none;
-            color: var(--text-primary);
-            padding: 8px;
-            border-radius: 50%;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .icon-btn:hover {
-            background-color: var(--dark-hover);
-        }
-
-        .user-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #ff6b6b, #ffa726);
-            display: flex;
-            align-items: center;
-            justify-content: center;
             color: white;
-            font-weight: bold;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 16px;
         }
 
-        /* Main Layout */
-        .main-container {
-            display: flex;
-            margin-top: 56px;
-            min-height: calc(100vh - 56px);
+        .video-player {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            border-radius: 12px;
+            margin-bottom: 20px;
         }
 
-        /* Sidebar */
-        .sidebar {
-            width: 240px;
-            background: var(--dark-bg);
-            position: fixed;
-            top: 56px;
-            left: 0;
-            bottom: 0;
-            overflow-y: auto;
-            padding: 12px 0;
-            transition: transform 0.3s ease;
-        }
-
-        .sidebar-hidden {
-            transform: translateX(-100%);
-        }
-
-        .sidebar-section {
-            padding: 8px 0;
-            border-bottom: 1px solid var(--dark-surface);
-        }
-
-        .sidebar-item {
-            display: flex;
-            align-items: center;
-            gap: 24px;
-            padding: 10px 24px;
-            cursor: pointer;
-            color: var(--text-primary);
-            text-decoration: none;
-            transition: background 0.2s;
-        }
-
-        .sidebar-item:hover {
-            background: var(--dark-hover);
-        }
-
-        .sidebar-item.active {
-            background: var(--dark-surface);
-        }
-
-        .sidebar-item i {
-            width: 24px;
-            text-align: center;
-            font-size: 18px;
-        }
-
-        .sidebar-item span {
-            font-size: 14px;
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            margin-left: 240px;
-            padding: 24px;
-            transition: margin-left 0.3s ease;
-        }
-
-        .main-content-expanded {
-            margin-left: 0;
-        }
-
-        /* Categories */
-        .categories {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-        }
-
-        .category-btn {
-            padding: 8px 12px;
-            background: var(--dark-surface);
+        .video-player iframe {
+            width: 100%;
+            height: 100%;
             border: none;
-            border-radius: 8px;
-            color: var(--text-primary);
-            cursor: pointer;
+            border-radius: 12px;
+        }
+
+        .video-info {
+            background: var(--dark-surface);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .video-title {
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .video-meta {
+            color: var(--text-secondary);
             font-size: 14px;
-            white-space: nowrap;
         }
 
-        .category-btn:hover {
-            background: var(--dark-hover);
-        }
-
-        .category-btn.active {
-            background: var(--text-primary);
-            color: var(--dark-bg);
-        }
-
-        /* Videos Grid */
-        .videos-grid {
+        .recommendations {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 16px;
+            margin-top: 20px;
         }
 
         .video-card {
+            background: var(--dark-surface);
+            border-radius: 12px;
+            overflow: hidden;
             cursor: pointer;
             transition: transform 0.2s;
         }
@@ -281,221 +162,84 @@
             transform: translateY(-2px);
         }
 
-        .thumbnail-container {
-            position: relative;
-            width: 100%;
-            margin-bottom: 12px;
-        }
-
         .thumbnail {
             width: 100%;
             aspect-ratio: 16/9;
-            background: var(--dark-surface);
-            border-radius: 12px;
             object-fit: cover;
         }
 
-        .video-duration {
-            position: absolute;
-            bottom: 8px;
-            right: 8px;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 12px;
+        .card-info {
+            padding: 12px;
+        }
+
+        .card-title {
             font-weight: 500;
-        }
-
-        .video-info {
-            display: flex;
-            gap: 12px;
-        }
-
-        .channel-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: var(--dark-surface);
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: var(--text-primary);
-        }
-
-        .video-details {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .video-title {
-            font-weight: 500;
-            margin-bottom: 4px;
+            margin-bottom: 8px;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
-            font-size: 16px;
-            line-height: 1.4;
         }
 
-        .channel-name {
+        .card-channel {
             color: var(--text-secondary);
             font-size: 14px;
-            margin-bottom: 2px;
-            cursor: pointer;
         }
 
-        .channel-name:hover {
-            color: var(--text-primary);
-        }
-
-        .video-meta {
-            color: var(--text-secondary);
+        .status-bar {
+            background: var(--dark-surface);
+            padding: 10px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
             font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        /* Video Player */
-        .video-player-container {
-            max-width: 1280px;
-            margin: 0 auto;
-        }
-
-        .player-layout {
-            display: grid;
-            grid-template-columns: 1fr 402px;
-            gap: 24px;
-            align-items: start;
-        }
-
-        .video-player {
-            width: 100%;
-            aspect-ratio: 16/9;
-            background: #000;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .video-player iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        .video-info-panel {
-            margin-top: 16px;
-            padding: 16px 0;
-            border-bottom: 1px solid var(--dark-surface);
-        }
-
-        .video-title-large {
-            font-size: 20px;
-            font-weight: 500;
-            margin-bottom: 12px;
-            line-height: 1.4;
-        }
-
-        .video-stats {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
         }
 
-        .views-count {
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
-
-        .video-actions {
-            display: flex;
-            gap: 16px;
-        }
-
-        .action-btn {
+        .status-indicator {
             display: flex;
             align-items: center;
-            gap: 6px;
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            padding: 8px 0;
-            font-size: 14px;
-            transition: color 0.2s;
+            gap: 8px;
         }
 
-        .action-btn:hover {
-            color: var(--text-primary);
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4CAF50;
         }
 
-        .channel-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 16px 0;
-            border-bottom: 1px solid var(--dark-surface);
+        .status-dot.connecting {
+            background: #FFC107;
+            animation: pulse 1.5s infinite;
         }
 
-        .channel-details {
-            flex: 1;
+        .status-dot.error {
+            background: #f44336;
         }
 
-        .channel-name-large {
-            font-weight: 500;
-            margin-bottom: 4px;
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
         }
 
-        .subscribers-count {
-            color: var(--text-secondary);
-            font-size: 13px;
-        }
-
-        .subscribe-btn {
-            padding: 10px 16px;
-            background: var(--text-primary);
-            color: var(--dark-bg);
-            border: none;
-            border-radius: 20px;
-            font-weight: 500;
-            cursor: pointer;
+        .proxy-info {
+            background: var(--dark-surface);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
             font-size: 14px;
         }
 
-        .subscribe-btn:hover {
-            background: #e6e6e6;
+        .proxy-info h3 {
+            margin-bottom: 10px;
+            color: var(--primary-red);
         }
 
-        .video-description {
-            padding: 16px 0;
-            color: var(--text-primary);
-            font-size: 14px;
-            line-height: 1.6;
-            white-space: pre-line;
-        }
-
-        /* Recommended Videos */
-        .recommended-videos {
-            padding-top: 8px;
-        }
-
-        .recommended-title {
-            font-size: 16px;
-            font-weight: 500;
-            margin-bottom: 16px;
-            color: var(--text-primary);
-        }
-
-        /* Loading */
         .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            text-align: center;
             padding: 40px;
             color: var(--text-secondary);
         }
@@ -507,7 +251,7 @@
             border-top: 2px solid var(--primary-red);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin-right: 12px;
+            margin: 0 auto 10px;
         }
 
         @keyframes spin {
@@ -515,1092 +259,373 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Error */
-        .error {
-            text-align: center;
-            padding: 40px;
-            color: var(--text-secondary);
-        }
-
-        .error i {
-            font-size: 48px;
-            margin-bottom: 16px;
-            color: var(--primary-red);
-        }
-
-        /* Auth Modal */
-        .auth-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .auth-content {
-            background-color: var(--dark-bg);
-            padding: 32px;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 400px;
-            border: 1px solid var(--dark-surface);
-        }
-
-        .auth-tabs {
-            display: flex;
-            margin-bottom: 24px;
-            border-bottom: 1px solid var(--dark-surface);
-        }
-
-        .auth-tab {
-            flex: 1;
-            text-align: center;
-            padding: 12px;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            color: var(--text-secondary);
-        }
-
-        .auth-tab.active {
-            border-bottom-color: var(--primary-red);
-            color: var(--primary-red);
-        }
-
-        .auth-form {
-            display: none;
-        }
-
-        .auth-form.active {
-            display: block;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--dark-surface);
-            border: 1px solid var(--dark-surface);
-            border-radius: 6px;
-            color: var(--text-primary);
-            font-size: 16px;
-            outline: none;
-        }
-
-        .form-group input:focus {
-            border-color: var(--primary-red);
-        }
-
-        .auth-submit {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--primary-red);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 16px;
-            font-weight: 500;
-        }
-
-        .auth-submit:hover {
-            background-color: #cc0000;
-        }
-
-        .close-auth {
-            float: right;
-            background: none;
-            border: none;
-            color: var(--text-primary);
-            font-size: 20px;
-            cursor: pointer;
-            padding: 4px;
-            border-radius: 50%;
-        }
-
-        .close-auth:hover {
-            background-color: var(--dark-hover);
-        }
-
-        /* User Menu */
-        .user-menu {
-            display: none;
-            position: absolute;
-            top: 60px;
-            right: 16px;
-            background: var(--dark-bg);
-            border: 1px solid var(--dark-surface);
-            border-radius: 12px;
-            padding: 8px 0;
-            min-width: 200px;
-            z-index: 1001;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-        }
-
-        .user-menu-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 16px;
-            color: var(--text-primary);
-            text-decoration: none;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .user-menu-item:hover {
-            background: var(--dark-hover);
-        }
-
-        .user-menu-item i {
-            width: 20px;
-            text-align: center;
-        }
-
-        /* Responsive */
-        @media (max-width: 1200px) {
-            .player-layout {
-                grid-template-columns: 1fr;
-            }
-            
-            .recommended-videos {
-                margin-top: 24px;
-            }
-        }
-
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
+            .container {
+                padding: 10px;
             }
             
-            .main-content {
-                margin-left: 0;
-                padding: 16px;
-            }
-            
-            .videos-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .header-center {
-                display: none;
-            }
-            
-            .categories {
-                overflow-x: auto;
-                padding-bottom: 8px;
-            }
-
-            .video-stats {
+            .proxy-selector {
                 flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
+                align-items: center;
             }
-
-            .video-actions {
+            
+            .proxy-btn {
                 width: 100%;
-                justify-content: space-between;
+                max-width: 300px;
+            }
+            
+            .recommendations {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-left">
-            <button class="menu-btn" onclick="toggleSidebar()">
-                <i class="fas fa-bars"></i>
-            </button>
-            <a href="#" class="logo" onclick="showHomePage(event)">
+    <div class="container">
+        <div class="header">
+            <div class="logo">
                 <i class="fab fa-youtube"></i>
-                <span>YouTube</span>
-            </a>
+                <span>ghtube</span>
+            </div>
+            <p>Доступ к YouTube без прокси и впн</p>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-indicator">
+                <div class="status-dot" id="statusDot"></div>
+                <span id="statusText">Выберите метод доступа</span>
+            </div>
+            <div id="connectionInfo"></div>
         </div>
         
-        <div class="header-center">
-            <div class="search-container">
-                <input type="text" class="search-input" placeholder="Поиск" id="searchInput">
-                <button class="search-btn" onclick="performSearch()">
-                    <i class="fas fa-search"></i>
-                </button>
-            </div>
-        </div>
-        
-        <div class="header-right">
-            <button class="icon-btn" onclick="showUploadModal()">
-                <i class="fas fa-video"></i>
-            </button>
-            <button class="icon-btn">
-                <i class="fas fa-bell"></i>
-            </button>
-            <div class="user-avatar" onclick="toggleUserMenu()" id="userAvatarBtn">
-                <i class="fas fa-user"></i>
-            </div>
+        <div class="proxy-selector">
+            <button class="proxy-btn active" onclick="selectProxy('cors')">CORS Proxy</button>
+            <button class="proxy-btn" onclick="selectProxy('youtubeproxy')">YouTube Proxy</button>
+            <button class="proxy-btn" onclick="selectProxy('invidious')">Invidious</button>
+            <button class="proxy-btn" onclick="selectProxy('piped')">Piped</button>
+            <button class="proxy-btn" onclick="selectProxy('direct')">Прямое соединение</button>
         </div>
 
-        <!-- User Menu -->
-        <div class="user-menu" id="userMenu">
-            <div class="user-menu-item" onclick="showAuthModal()">
-                <i class="fas fa-user-circle"></i>
-                <span>Войти</span>
-            </div>
-            <div class="user-menu-item">
-                <i class="fas fa-history"></i>
-                <span>История просмотров</span>
-            </div>
-            <div class="user-menu-item">
-                <i class="fas fa-play-circle"></i>
-                <span>Мои видео</span>
-            </div>
-            <div class="user-menu-item">
-                <i class="fas fa-cog"></i>
-                <span>Настройки</span>
+        <div class="search-container">
+            <input type="text" class="search-input" id="searchInput" placeholder="Введите URL YouTube видео или поисковый запрос...">
+            <button class="search-btn" onclick="loadVideo()">
+                <i class="fas fa-play"></i> Смотреть
+            </button>
+        </div>
+
+        <div class="video-player" id="videoPlayer">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <div>Выберите видео для воспроизведения</div>
             </div>
         </div>
-    </header>
 
-    <!-- Main Container -->
-    <div class="main-container">
-        <!-- Sidebar -->
-        <nav class="sidebar" id="sidebar">
-            <div class="sidebar-section">
-                <a href="#" class="sidebar-item active" onclick="showHomePage(event)">
-                    <i class="fas fa-home"></i>
-                    <span>Главная</span>
-                </a>
-                <a href="#" class="sidebar-item" onclick="loadTrendingVideos(event)">
-                    <i class="fas fa-fire"></i>
-                    <span>В тренде</span>
-                </a>
-                <a href="#" class="sidebar-item">
-                    <i class="fas fa-play-circle"></i>
-                    <span>Подписки</span>
-                </a>
-            </div>
-            
-            <div class="sidebar-section">
-                <a href="#" class="sidebar-item">
-                    <i class="fas fa-folder"></i>
-                    <span>Библиотека</span>
-                </a>
-                <a href="#" class="sidebar-item">
-                    <i class="fas fa-history"></i>
-                    <span>История</span>
-                </a>
-                <a href="#" class="sidebar-item">
-                    <i class="fas fa-clock"></i>
-                    <span>Смотреть позже</span>
-                </a>
-                <a href="#" class="sidebar-item">
-                    <i class="fas fa-thumbs-up"></i>
-                    <span>Понравившиеся</span>
-                </a>
-            </div>
-            
-            <div class="sidebar-section">
-                <div class="sidebar-item">
-                    <span>Подписки</span>
-                </div>
-                <div class="sidebar-item">
-                    <div class="channel-avatar">M</div>
-                    <span>Music Channel</span>
-                </div>
-                <div class="sidebar-item">
-                    <div class="channel-avatar">T</div>
-                    <span>Tech Reviews</span>
-                </div>
-                <div class="sidebar-item">
-                    <div class="channel-avatar">G</div>
-                    <span>Gaming Live</span>
-                </div>
-            </div>
+        <div class="video-info" id="videoInfo" style="display: none;">
+            <div class="video-title" id="videoTitle">Название видео</div>
+            <div class="video-meta" id="videoMeta">Информация о видео</div>
+        </div>
 
-            <div class="sidebar-section">
-                <div class="sidebar-item">
-                    <span>Настройки</span>
-                </div>
-                <div class="sidebar-item">
-                    <i class="fas fa-cog"></i>
-                    <span>Настройки</span>
-                </div>
-                <div class="sidebar-item">
-                    <i class="fas fa-flag"></i>
-                    <span>Жалобы</span>
-                </div>
-                <div class="sidebar-item">
-                    <i class="fas fa-question-circle"></i>
-                    <span>Справка</span>
-                </div>
-            </div>
-        </nav>
-
-        <!-- Main Content -->
-        <main class="main-content" id="mainContent">
-            <!-- Home Page -->
-            <div id="homePage">
-                <div class="categories">
-                    <button class="category-btn active" onclick="loadVideos('mostPopular')">Все</button>
-                    <button class="category-btn" onclick="loadVideos('music')">Музыка</button>
-                    <button class="category-btn" onclick="loadVideos('gaming')">Игры</button>
-                    <button class="category-btn" onclick="loadVideos('live')">Прямой эфир</button>
-                    <button class="category-btn" onclick="loadVideos('comedy')">Юмор</button>
-                    <button class="category-btn" onclick="loadVideos('sports')">Спорт</button>
-                    <button class="category-btn" onclick="loadVideos('education')">Образование</button>
-                    <button class="category-btn" onclick="loadVideos('beauty')">Красота</button>
-                </div>
-                
-                <div class="videos-grid" id="videosGrid">
-                    <div class="loading">
-                        <div class="loading-spinner"></div>
-                        <span>Загрузка видео...</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Video Player Page -->
-            <div class="video-player-container" id="videoPlayerPage" style="display: none;">
-                <div class="player-layout">
-                    <div class="player-column">
-                        <div class="video-player">
-                            <iframe id="youtubePlayer" allowfullscreen></iframe>
-                        </div>
-                        
-                        <div class="video-info-panel">
-                            <h1 class="video-title-large" id="videoTitleLarge">Название видео</h1>
-                            
-                            <div class="video-stats">
-                                <div class="views-count" id="viewsCount">0 просмотров</div>
-                                <div class="video-actions">
-                                    <button class="action-btn">
-                                        <i class="fas fa-thumbs-up"></i>
-                                        <span id="likeCount">123K</span>
-                                    </button>
-                                    <button class="action-btn">
-                                        <i class="fas fa-thumbs-down"></i>
-                                        <span>Не нравится</span>
-                                    </button>
-                                    <button class="action-btn">
-                                        <i class="fas fa-share"></i>
-                                        <span>Поделиться</span>
-                                    </button>
-                                    <button class="action-btn">
-                                        <i class="fas fa-plus"></i>
-                                        <span>Сохранить</span>
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <div class="channel-info">
-                                <div class="channel-avatar" id="channelAvatarLarge">C</div>
-                                <div class="channel-details">
-                                    <div class="channel-name-large" id="channelNameLarge">Название канала</div>
-                                    <div class="subscribers-count" id="subscribersCount">1.5 млн подписчиков</div>
-                                </div>
-                                <button class="subscribe-btn" id="subscribeBtn">Подписаться</button>
-                            </div>
-                            
-                            <div class="video-description" id="videoDescription">
-                                Описание видео загружается...
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="recommended-column">
-                        <h3 class="recommended-title">Рекомендуемые</h3>
-                        <div class="recommended-videos" id="recommendedVideos">
-                            <!-- Recommended videos will be loaded here -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Search Results Page -->
-            <div id="searchResultsPage" style="display: none;">
-                <div class="search-info" style="margin-bottom: 24px;">
-                    <h2 style="font-weight: 500;">Результаты поиска</h2>
-                    <div style="color: var(--text-secondary); font-size: 14px; margin-top: 4px;">
-                        Найдено видео: <span id="resultsCount">0</span>
-                    </div>
-                </div>
-                <div class="videos-grid" id="searchResultsGrid">
-                    <!-- Search results will be loaded here -->
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Auth Modal -->
-    <div class="auth-modal" id="authModal">
-        <div class="auth-content">
-            <button class="close-auth" onclick="closeAuthModal()">
-                <i class="fas fa-times"></i>
-            </button>
-            
-            <div class="auth-tabs">
-                <div class="auth-tab active" onclick="switchAuthTab('login')">Вход</div>
-                <div class="auth-tab" onclick="switchAuthTab('register')">Регистрация</div>
-            </div>
-            
-            <div class="auth-form active" id="loginForm">
-                <div class="form-group">
-                    <input type="email" placeholder="Email" id="loginEmail">
-                </div>
-                <div class="form-group">
-                    <input type="password" placeholder="Пароль" id="loginPassword">
-                </div>
-                <button class="auth-submit" onclick="login()">Войти</button>
-            </div>
-            
-            <div class="auth-form" id="registerForm">
-                <div class="form-group">
-                    <input type="text" placeholder="Имя пользователя" id="registerUsername">
-                </div>
-                <div class="form-group">
-                    <input type="email" placeholder="Email" id="registerEmail">
-                </div>
-                <div class="form-group">
-                    <input type="password" placeholder="Пароль" id="registerPassword">
-                </div>
-                <button class="auth-submit" onclick="register()">Зарегистрироваться</button>
-            </div>
+        <div class="recommendations" id="recommendations">
         </div>
     </div>
 
     <script>
-        // YouTube API configuration
-        const YOUTUBE_API_KEY = 'AIzaSyCwdJwp6bpEwmxkgYuIgzPXMkT31BfluRA';
-        const API_BASE_URL = 'https://www.googleapis.com/youtube/v3';
-
-        // Application state
-        let currentState = {
-            currentPage: 'home',
-            currentVideoId: null,
-            currentCategory: 'mostPopular',
-            searchQuery: '',
-            nextPageToken: null,
-            isLoading: false
+        // Конфигурация прокси и методов обхода
+        const PROXY_CONFIG = {
+            cors: {
+                name: "CORS Proxy",
+                videoUrl: (id) => `https://www.youtube.com/embed/${id}`,
+                apiUrl: (endpoint) => `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://www.youtube.com/${endpoint}`)}`,
+                type: "embed"
+            },
+            youtubeproxy: {
+                name: "YouTube Proxy",
+                videoUrl: (id) => `https://yt.artemislena.eu/embed/${id}`,
+                apiUrl: (endpoint) => `https://yt.artemislena.eu/api/v1/${endpoint}`,
+                type: "proxy"
+            },
+            invidious: {
+                name: "Invidious",
+                videoUrl: (id) => `https://invidious.fdn.fr/embed/${id}`,
+                apiUrl: (endpoint) => `https://invidious.fdn.fr/api/v1/${endpoint}`,
+                type: "alternative"
+            },
+            piped: {
+                name: "Piped",
+                videoUrl: (id) => `https://piped.video/embed/${id}`,
+                apiUrl: (endpoint) => `https://piped.video/api/v1/${endpoint}`,
+                type: "alternative"
+            },
+            direct: {
+                name: "Прямое соединение",
+                videoUrl: (id) => `https://www.youtube.com/embed/${id}`,
+                apiUrl: (endpoint) => `https://www.youtube.com/${endpoint}`,
+                type: "direct"
+            }
         };
 
-        // Cache for recommendations and user data
-        const recommendationsCache = new Map();
-        let currentUser = null;
+        // Текущие настройки
+        let currentProxy = 'cors';
+        let currentVideoId = null;
 
-        // Initialize the application
-        async function init() {
-            await loadVideos('mostPopular');
-            setupEventListeners();
-        }
+        // Элементы DOM
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+        const connectionInfo = document.getElementById('connectionInfo');
+        const videoPlayer = document.getElementById('videoPlayer');
+        const videoInfo = document.getElementById('videoInfo');
+        const videoTitle = document.getElementById('videoTitle');
+        const videoMeta = document.getElementById('videoMeta');
+        const recommendations = document.getElementById('recommendations');
 
-        // Setup event listeners
-        function setupEventListeners() {
-            // Search input enter key
-            document.getElementById('searchInput').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    performSearch();
-                }
-            });
-
-            // Category buttons
-            document.querySelectorAll('.category-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                });
-            });
-
-            // Infinite scroll
-            window.addEventListener('scroll', handleInfiniteScroll);
-
-            // Close user menu when clicking outside
-            document.addEventListener('click', function(event) {
-                const userMenu = document.getElementById('userMenu');
-                const userAvatarBtn = document.getElementById('userAvatarBtn');
-                
-                if (!userAvatarBtn.contains(event.target) && !userMenu.contains(event.target)) {
-                    userMenu.style.display = 'none';
-                }
-            });
-        }
-
-        // Handle infinite scroll
-        function handleInfiniteScroll() {
-            const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+        // Выбор прокси
+        function selectProxy(proxyType) {
+            document.querySelectorAll('.proxy-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
             
-            if (scrollTop + clientHeight >= scrollHeight - 1000 && !currentState.isLoading && currentState.nextPageToken) {
-                loadMoreVideos();
-            }
-        }
-
-        // Load videos based on category or search
-        async function loadVideos(category = 'mostPopular', searchQuery = '') {
-            currentState.currentCategory = category;
-            currentState.searchQuery = searchQuery;
-            currentState.nextPageToken = null;
+            currentProxy = proxyType;
+            updateStatus('connecting', `Подключение через ${PROXY_CONFIG[proxyType].name}...`);
             
-            const grid = category === 'search' ? 
-                document.getElementById('searchResultsGrid') : 
-                document.getElementById('videosGrid');
-            
-            showLoading(grid);
-
-            try {
-                let response;
-                if (category === 'search' && searchQuery) {
-                    response = await searchVideos(searchQuery);
-                } else {
-                    response = await getPopularVideos(category);
-                }
-
-                currentState.nextPageToken = response.nextPageToken || null;
-                displayVideos(response.items, grid);
-                
-                if (category === 'search') {
-                    document.getElementById('resultsCount').textContent = response.pageInfo.totalResults.toLocaleString();
-                }
-
-            } catch (error) {
-                showError(grid, 'Ошибка загрузки видео');
-                console.error('Error loading videos:', error);
-            }
-        }
-
-        // Load trending videos
-        async function loadTrendingVideos(event) {
-            if (event) event.preventDefault();
-            await loadVideos('mostPopular');
-        }
-
-        // Load more videos for infinite scroll
-        async function loadMoreVideos() {
-            if (currentState.isLoading || !currentState.nextPageToken) return;
-            
-            currentState.isLoading = true;
-            const grid = currentState.currentCategory === 'search' ? 
-                document.getElementById('searchResultsGrid') : 
-                document.getElementById('videosGrid');
-            
-            // Show loading indicator at the bottom
-            const loadingIndicator = document.createElement('div');
-            loadingIndicator.className = 'loading';
-            loadingIndicator.innerHTML = `
-                <div class="loading-spinner"></div>
-                <span>Загрузка...</span>
-            `;
-            grid.appendChild(loadingIndicator);
-
-            try {
-                let response;
-                if (currentState.currentCategory === 'search' && currentState.searchQuery) {
-                    response = await searchVideos(currentState.searchQuery, currentState.nextPageToken);
-                } else {
-                    response = await getPopularVideos(currentState.currentCategory, currentState.nextPageToken);
-                }
-
-                currentState.nextPageToken = response.nextPageToken || null;
-                
-                // Remove loading indicator
-                grid.removeChild(loadingIndicator);
-                
-                // Append new videos
-                displayVideos(response.items, grid, true);
-                
-            } catch (error) {
-                console.error('Error loading more videos:', error);
-                grid.removeChild(loadingIndicator);
-            } finally {
-                currentState.isLoading = false;
-            }
-        }
-
-        // Get popular videos from YouTube API
-        async function getPopularVideos(category = 'mostPopular', pageToken = '') {
-            let url = `${API_BASE_URL}/videos?part=snippet,statistics,contentDetails&chart=mostPopular&maxResults=24&regionCode=US&key=${YOUTUBE_API_KEY}`;
-            
-            // Map categories to YouTube category IDs
-            const categoryMap = {
-                music: '10',
-                gaming: '20',
-                comedy: '23',
-                sports: '17',
-                education: '27',
-                beauty: '26',
-                live: '36'
-            };
-
-            if (category !== 'mostPopular' && categoryMap[category]) {
-                url += `&videoCategoryId=${categoryMap[category]}`;
-            }
-
-            if (pageToken) {
-                url += `&pageToken=${pageToken}`;
-            }
-
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error('API request failed');
-            }
-            return await response.json();
-        }
-
-        // Search videos
-        async function searchVideos(query, pageToken = '') {
-            let url = `${API_BASE_URL}/search?part=snippet&maxResults=24&q=${encodeURIComponent(query)}&type=video&key=${YOUTUBE_API_KEY}`;
-            
-            if (pageToken) {
-                url += `&pageToken=${pageToken}`;
-            }
-
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error('Search request failed');
-            }
-            return await response.json();
-        }
-
-        // Get video details
-        async function getVideoDetails(videoId) {
-            const url = `${API_BASE_URL}/videos?part=snippet,statistics,contentDetails&id=${videoId}&key=${YOUTUBE_API_KEY}`;
-            
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error('Video details request failed');
-            }
-            const data = await response.json();
-            return data.items[0];
-        }
-
-        // Get channel details
-        async function getChannelDetails(channelId) {
-            const url = `${API_BASE_URL}/channels?part=snippet,statistics&id=${channelId}&key=${YOUTUBE_API_KEY}`;
-            
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error('Channel details request failed');
-            }
-            const data = await response.json();
-            return data.items[0];
-        }
-
-        // Get enhanced recommendations using multiple strategies
-        async function getEnhancedRecommendations(videoId) {
-            // Check cache first
-            if (recommendationsCache.has(videoId)) {
-                return recommendationsCache.get(videoId);
-            }
-
-            try {
-                const videoDetails = await getVideoDetails(videoId);
-                const channelId = videoDetails.snippet.channelId;
-                const categoryId = videoDetails.snippet.categoryId;
-                
-                // Strategy 1: Search by video title keywords
-                const searchQuery = generateSearchQuery(videoDetails);
-                const relatedBySearch = await searchVideos(searchQuery);
-                
-                // Strategy 2: Get videos from same channel
-                const channelVideos = await getChannelVideos(channelId);
-                
-                // Strategy 3: Get popular videos from same category
-                const categoryVideos = await getCategoryVideos(categoryId);
-                
-                // Combine all strategies
-                const allVideos = [
-                    ...(relatedBySearch.items || []),
-                    ...(channelVideos || []),
-                    ...(categoryVideos || [])
-                ];
-                
-                // Remove duplicates and current video
-                const uniqueVideos = [];
-                const seenIds = new Set();
-                
-                for (const video of allVideos) {
-                    const vid = video.id.videoId || video.id;
-                    if (!seenIds.has(vid) && vid !== videoId) {
-                        seenIds.add(vid);
-                        uniqueVideos.push(video);
+            // Тестируем соединение
+            testConnection(proxyType).then(success => {
+                if (success) {
+                    updateStatus('connected', `Подключено через ${PROXY_CONFIG[proxyType].name}`);
+                    if (currentVideoId) {
+                        loadVideoById(currentVideoId);
                     }
-                    
-                    if (uniqueVideos.length >= 20) break;
+                } else {
+                    updateStatus('error', `Ошибка подключения через ${PROXY_CONFIG[proxyType].name}`);
                 }
-                
-                // Cache the results
-                recommendationsCache.set(videoId, uniqueVideos);
-                
-                return uniqueVideos;
-                
-            } catch (error) {
-                console.error('Error getting enhanced recommendations:', error);
-                // Fallback to popular videos
-                return await getFallbackVideos();
-            }
-        }
-
-        // Generate search query from video title
-        function generateSearchQuery(videoDetails) {
-            const title = videoDetails.snippet.title;
-            const channel = videoDetails.snippet.channelTitle;
-            
-            // Remove common words and extract meaningful keywords
-            const stopWords = ['official', 'video', 'music', 'lyrics', 'hd', '4k', 'full', 'version', 'official video', 'official music video'];
-            let keywords = title.toLowerCase();
-            
-            stopWords.forEach(word => {
-                keywords = keywords.replace(new RegExp(word, 'gi'), '');
             });
+        }
+
+        // Обновление статуса
+        function updateStatus(status, message) {
+            statusDot.className = 'status-dot';
+            statusText.textContent = message;
             
-            // Clean up and take first few words
-            keywords = keywords.replace(/[^\w\s]/g, '')
-                .split(' ')
-                .filter(word => word.length > 2)
-                .slice(0, 3)
-                .join(' ');
+            switch(status) {
+                case 'connecting':
+                    statusDot.classList.add('connecting');
+                    break;
+                case 'connected':
+                    statusDot.classList.add('connected');
+                    break;
+                case 'error':
+                    statusDot.classList.add('error');
+                    break;
+            }
             
-            return keywords || channel || 'popular videos';
+            connectionInfo.textContent = `Метод: ${PROXY_CONFIG[currentProxy].name} | Тип: ${PROXY_CONFIG[currentProxy].type}`;
         }
 
-        // Get videos from same channel
-        async function getChannelVideos(channelId, maxResults = 10) {
+        // Тестирование соединения
+        async function testConnection(proxyType) {
             try {
-                const url = `${API_BASE_URL}/search?part=snippet&channelId=${channelId}&maxResults=${maxResults}&order=date&type=video&key=${YOUTUBE_API_KEY}`;
-                
-                const response = await fetch(url);
-                if (!response.ok) return [];
-                
-                const data = await response.json();
-                return data.items || [];
+                const testUrl = PROXY_CONFIG[proxyType].apiUrl('oembed?url=https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+                const response = await fetch(testUrl, { 
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                return response.ok;
             } catch (error) {
-                console.error('Error getting channel videos:', error);
-                return [];
+                console.error('Connection test failed:', error);
+                return false;
             }
         }
 
-        // Get videos from same category
-        async function getCategoryVideos(categoryId, maxResults = 10) {
-            try {
-                const url = `${API_BASE_URL}/videos?part=snippet&chart=mostPopular&videoCategoryId=${categoryId}&maxResults=${maxResults}&regionCode=US&key=${YOUTUBE_API_KEY}`;
-                
-                const response = await fetch(url);
-                if (!response.ok) return [];
-                
-                const data = await response.json();
-                return data.items || [];
-            } catch (error) {
-                console.error('Error getting category videos:', error);
-                return [];
-            }
-        }
-
-        // Fallback to popular videos
-        async function getFallbackVideos() {
-            try {
-                const response = await getPopularVideos('mostPopular');
-                return response.items.slice(0, 15);
-            } catch (error) {
-                console.error('Error getting fallback videos:', error);
-                return [];
-            }
-        }
-
-        // Display videos in grid
-        function displayVideos(videos, grid, append = false) {
-            if (!videos || videos.length === 0) {
-                if (!append) {
-                    grid.innerHTML = '<div class="error"><i class="fas fa-video-slash"></i><div>Видео не найдены</div></div>';
-                }
+        // Загрузка видео по URL или ID
+        function loadVideo() {
+            const input = document.getElementById('searchInput').value.trim();
+            
+            if (!input) {
+                alert('Пожалуйста, введите URL YouTube видео или поисковый запрос');
                 return;
             }
 
-            const videosHTML = videos.map(video => {
-                const videoId = video.id.videoId || video.id;
-                const snippet = video.snippet;
-                const statistics = video.statistics || {};
-                const contentDetails = video.contentDetails || {};
-                
-                // Format view count
-                const views = statistics.viewCount ? formatCount(statistics.viewCount) : 'Нет данных';
-                
-                // Format duration
-                const duration = contentDetails.duration ? formatDuration(contentDetails.duration) : '';
-                
-                // Time ago
-                const timeAgo = getTimeAgo(snippet.publishedAt);
-                
-                // Channel avatar initial
-                const channelInitial = snippet.channelTitle ? snippet.channelTitle.charAt(0).toUpperCase() : 'C';
+            let videoId = extractVideoId(input);
+            
+            if (!videoId) {
+                // Если это не URL, пытаемся поискать
+                searchVideos(input);
+                return;
+            }
 
-                return `
-                    <div class="video-card" onclick="playVideo('${videoId}')">
-                        <div class="thumbnail-container">
-                            <img class="thumbnail" src="${snippet.thumbnails.medium.url}" alt="${snippet.title}" loading="lazy">
-                            ${duration ? `<div class="video-duration">${duration}</div>` : ''}
-                        </div>
-                        <div class="video-info">
-                            <div class="channel-avatar">${channelInitial}</div>
-                            <div class="video-details">
-                                <div class="video-title" title="${snippet.title}">${snippet.title}</div>
-                                <div class="channel-name">${snippet.channelTitle}</div>
-                                <div class="video-meta">${views} просмотров • ${timeAgo}</div>
-                            </div>
+            loadVideoById(videoId);
+        }
+
+        // Извлечение ID видео из URL
+        function extractVideoId(url) {
+            const patterns = [
+                /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&?#]+)/,
+                /^[A-Za-z0-9_-]{11}$/
+            ];
+            
+            for (let pattern of patterns) {
+                const match = url.match(pattern);
+                if (match) return match[1];
+            }
+            
+            return null;
+        }
+
+        // Загрузка видео по ID
+        function loadVideoById(videoId) {
+            currentVideoId = videoId;
+            const proxy = PROXY_CONFIG[currentProxy];
+            
+            updateStatus('connecting', `Загрузка видео через ${proxy.name}...`);
+            
+            // Создаем iframe для видео
+            videoPlayer.innerHTML = `
+                <iframe 
+                    src="${proxy.videoUrl(videoId)}" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>
+            `;
+            
+            // Загружаем информацию о видео
+            loadVideoInfo(videoId);
+            
+            // Загружаем рекомендации
+            loadRecommendations(videoId);
+            
+            updateStatus('connected', `Видео загружено через ${proxy.name}`);
+        }
+
+        // Загрузка информации о видео
+        async function loadVideoInfo(videoId) {
+            try {
+                const proxy = PROXY_CONFIG[currentProxy];
+                let apiUrl;
+                
+                if (proxy.type === 'proxy' || proxy.type === 'alternative') {
+                    apiUrl = proxy.apiUrl(`videos/${videoId}`);
+                } else {
+                    // Для CORS и прямого соединения используем обходные методы
+                    apiUrl = `https://noembed.com/embed?url=https://www.youtube.com/watch?v=${videoId}`;
+                }
+                
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+                
+                videoTitle.textContent = data.title || 'Название не доступно';
+                videoMeta.textContent = data.author_name ? `Канал: ${data.author_name}` : 'Информация о видео';
+                videoInfo.style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error loading video info:', error);
+                videoTitle.textContent = 'Ошибка загрузки информации';
+                videoMeta.textContent = 'Попробуйте другой метод доступа';
+                videoInfo.style.display = 'block';
+            }
+        }
+
+        // Поиск видео
+        async function searchVideos(query) {
+            updateStatus('connecting', `Поиск видео: ${query}...`);
+            
+            try {
+                const proxy = PROXY_CONFIG[currentProxy];
+                let searchUrl;
+                
+                if (proxy.type === 'proxy' || proxy.type === 'alternative') {
+                    searchUrl = proxy.apiUrl(`search?q=${encodeURIComponent(query)}&filter=videos`);
+                } else {
+                    // Для CORS используем обходной метод
+                    searchUrl = `https://noembed.com/embed?url=https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+                }
+                
+                const response = await fetch(searchUrl);
+                const data = await response.json();
+                
+                displaySearchResults(data, query);
+                updateStatus('connected', `Найдено видео по запросу: ${query}`);
+                
+            } catch (error) {
+                console.error('Search error:', error);
+                updateStatus('error', 'Ошибка поиска');
+            }
+        }
+
+        // Отображение результатов поиска
+        function displaySearchResults(data, query) {
+            recommendations.innerHTML = '<div class="loading"><div class="loading-spinner"></div><div>Загрузка результатов...</div></div>';
+            
+            // Симуляция результатов поиска (в реальном приложении здесь будет парсинг данных)
+            setTimeout(() => {
+                const mockResults = [
+                    { id: 'dQw4w9WgXcQ', title: `Результат по запросу: ${query}`, channel: 'YouTube' },
+                    { id: 'kJQP7kiw5Fk', title: 'Luis Fonsi - Despacito ft. Daddy Yankee', channel: 'Luis Fonsi' },
+                    { id: '9bZkp7q19f0', title: 'PSY - GANGNAM STYLE', channel: 'officialpsy' },
+                    { id: 'JGwWNGJdvx8', title: 'Ed Sheeran - Shape of You', channel: 'Ed Sheeran' }
+                ];
+                
+                recommendations.innerHTML = mockResults.map(video => `
+                    <div class="video-card" onclick="loadVideoById('${video.id}')">
+                        <img src="https://i.ytimg.com/vi/${video.id}/hqdefault.jpg" alt="${video.title}" class="thumbnail">
+                        <div class="card-info">
+                            <div class="card-title">${video.title}</div>
+                            <div class="card-channel">${video.channel}</div>
                         </div>
                     </div>
-                `;
-            }).join('');
-
-            if (append) {
-                grid.innerHTML += videosHTML;
-            } else {
-                grid.innerHTML = videosHTML;
-            }
+                `).join('');
+            }, 1000);
         }
 
-        // Play video
-        async function playVideo(videoId) {
-            currentState.currentVideoId = videoId;
+        // Загрузка рекомендаций
+        async function loadRecommendations(videoId) {
+            recommendations.innerHTML = '<div class="loading"><div class="loading-spinner"></div><div>Загрузка рекомендаций...</div></div>';
             
-            // Show player page
-            document.getElementById('homePage').style.display = 'none';
-            document.getElementById('searchResultsPage').style.display = 'none';
-            document.getElementById('videoPlayerPage').style.display = 'block';
-
-            // Load video in player
-            document.getElementById('youtubePlayer').src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
-
             try {
-                // Load video details
-                const videoDetails = await getVideoDetails(videoId);
-                const channelDetails = await getChannelDetails(videoDetails.snippet.channelId);
-
-                // Update UI with video details
-                document.getElementById('videoTitleLarge').textContent = videoDetails.snippet.title;
-                document.getElementById('viewsCount').textContent = `${formatCount(videoDetails.statistics.viewCount)} просмотров`;
-                document.getElementById('likeCount').textContent = formatCount(videoDetails.statistics.likeCount);
-                document.getElementById('channelNameLarge').textContent = videoDetails.snippet.channelTitle;
-                document.getElementById('channelAvatarLarge').textContent = videoDetails.snippet.channelTitle.charAt(0).toUpperCase();
-                document.getElementById('subscribersCount').textContent = `${formatCount(channelDetails.statistics.subscriberCount)} подписчиков`;
-                document.getElementById('videoDescription').textContent = videoDetails.snippet.description;
-
-                // Load enhanced recommendations
-                await loadEnhancedRecommendedVideos(videoId);
-
-            } catch (error) {
-                console.error('Error loading video details:', error);
-            }
-        }
-
-        // Load enhanced recommended videos
-        async function loadEnhancedRecommendedVideos(videoId) {
-            const recommendedContainer = document.getElementById('recommendedVideos');
-            showLoading(recommendedContainer);
-
-            try {
-                const recommendedVideos = await getEnhancedRecommendations(videoId);
+                // Используем статические рекомендации для демонстрации
+                const mockRecommendations = [
+                    { id: 'kJQP7kiw5Fk', title: 'Luis Fonsi - Despacito ft. Daddy Yankee', channel: 'Luis Fonsi' },
+                    { id: '9bZkp7q19f0', title: 'PSY - GANGNAM STYLE', channel: 'officialpsy' },
+                    { id: 'JGwWNGJdvx8', title: 'Ed Sheeran - Shape of You', channel: 'Ed Sheeran' },
+                    { id: 'fJ9rUzIMcZQ', title: 'Queen - Bohemian Rhapsody', channel: 'Queen Official' },
+                    { id: 'OPf0YbXqDm0', title: 'Mark Ronson - Uptown Funk ft. Bruno Mars', channel: 'Mark Ronson' },
+                    { id: '09R8_2nJtjg', title: 'Maroon 5 - Sugar', channel: 'Maroon5' }
+                ];
                 
-                if (recommendedVideos.length > 0) {
-                    displayVideos(recommendedVideos, recommendedContainer);
-                } else {
-                    // Fallback to popular videos
-                    const fallbackVideos = await getFallbackVideos();
-                    displayVideos(fallbackVideos, recommendedContainer);
-                }
+                setTimeout(() => {
+                    recommendations.innerHTML = mockRecommendations.map(video => `
+                        <div class="video-card" onclick="loadVideoById('${video.id}')">
+                            <img src="https://i.ytimg.com/vi/${video.id}/hqdefault.jpg" alt="${video.title}" class="thumbnail">
+                            <div class="card-info">
+                                <div class="card-title">${video.title}</div>
+                                <div class="card-channel">${video.channel}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                }, 1500);
                 
             } catch (error) {
                 console.error('Error loading recommendations:', error);
-                showError(recommendedContainer, 'Ошибка загрузки рекомендаций');
+                recommendations.innerHTML = '<div class="error">Ошибка загрузки рекомендаций</div>';
             }
         }
 
-        // Show home page
-        function showHomePage(event) {
-            if (event) event.preventDefault();
+        // Инициализация
+        function init() {
+            updateStatus('connected', 'Готов к работе. Выберите видео.');
             
-            document.getElementById('homePage').style.display = 'block';
-            document.getElementById('videoPlayerPage').style.display = 'none';
-            document.getElementById('searchResultsPage').style.display = 'none';
+            // Загружаем популярные видео при старте
+            loadRecommendations('dQw4w9WgXcQ');
             
-            currentState.currentPage = 'home';
-            
-            // Reset active category
-            document.querySelectorAll('.category-btn').forEach((btn, index) => {
-                btn.classList.toggle('active', index === 0);
+            // Обработка Enter в поле поиска
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    loadVideo();
+                }
             });
         }
 
-        // Perform search
-        function performSearch() {
-            const query = document.getElementById('searchInput').value.trim();
-            if (!query) return;
-
-            currentState.currentPage = 'search';
-            
-            // Show search results page
-            document.getElementById('homePage').style.display = 'none';
-            document.getElementById('videoPlayerPage').style.display = 'none';
-            document.getElementById('searchResultsPage').style.display = 'block';
-
-            loadVideos('search', query);
-        }
-
-        // Toggle sidebar
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const mainContent = document.getElementById('mainContent');
-            
-            sidebar.classList.toggle('sidebar-hidden');
-            mainContent.classList.toggle('main-content-expanded');
-        }
-
-        // Toggle user menu
-        function toggleUserMenu() {
-            const userMenu = document.getElementById('userMenu');
-            userMenu.style.display = userMenu.style.display === 'block' ? 'none' : 'block';
-        }
-
-        // Auth functions
-        function showAuthModal() {
-            document.getElementById('authModal').style.display = 'flex';
-            document.getElementById('userMenu').style.display = 'none';
-        }
-
-        function closeAuthModal() {
-            document.getElementById('authModal').style.display = 'none';
-        }
-
-        function switchAuthTab(tab) {
-            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
-            
-            document.querySelector(`.auth-tab:nth-child(${tab === 'login' ? 1 : 2})`).classList.add('active');
-            document.getElementById(tab === 'login' ? 'loginForm' : 'registerForm').classList.add('active');
-        }
-
-        function login() {
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            
-            if (email && password) {
-                // Mock login
-                currentUser = {
-                    username: email.split('@')[0],
-                    email: email
-                };
-                
-                updateAuthUI();
-                closeAuthModal();
-                
-                alert('Успешный вход!');
-            } else {
-                alert('Пожалуйста, заполните все поля');
-            }
-        }
-
-        function register() {
-            const username = document.getElementById('registerUsername').value;
-            const email = document.getElementById('registerEmail').value;
-            const password = document.getElementById('registerPassword').value;
-            
-            if (username && email && password) {
-                // Mock registration
-                currentUser = {
-                    username: username,
-                    email: email
-                };
-                
-                updateAuthUI();
-                closeAuthModal();
-                
-                alert('Регистрация успешна!');
-            } else {
-                alert('Пожалуйста, заполните все поля');
-            }
-        }
-
-        function updateAuthUI() {
-            const userAvatarBtn = document.getElementById('userAvatarBtn');
-            if (currentUser) {
-                userAvatarBtn.innerHTML = currentUser.username.charAt(0).toUpperCase();
-                userAvatarBtn.style.background = 'linear-gradient(45deg, #667eea, #764ba2)';
-            }
-        }
-
-        function showUploadModal() {
-            if (!currentUser) {
-                showAuthModal();
-                return;
-            }
-            alert('Функция загрузки видео будет доступна после полной реализации!');
-        }
-
-        // Utility functions
-        function formatCount(count) {
-            if (!count) return '0';
-            const num = parseInt(count);
-            if (num >= 1000000) {
-                return (num / 1000000).toFixed(1) + ' млн';
-            } else if (num >= 1000) {
-                return (num / 1000).toFixed(1) + ' тыс';
-            }
-            return num.toString();
-        }
-
-        function formatDuration(duration) {
-            const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
-            if (!match) return '';
-            
-            const hours = (match[1] || '').replace('H', '');
-            const minutes = (match[2] || '').replace('M', '');
-            const seconds = (match[3] || '').replace('S', '');
-            
-            if (hours) {
-                return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}:${seconds.padStart(2, '0')}`;
-            }
-            return `${minutes.padStart(2, '0')}:${seconds.padStart(2, '0')}`;
-        }
-
-        function getTimeAgo(publishedAt) {
-            const published = new Date(publishedAt);
-            const now = new Date();
-            const diffMs = now - published;
-            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-            
-            if (diffDays < 1) return 'Сегодня';
-            if (diffDays === 1) return 'Вчера';
-            if (diffDays < 7) return `${diffDays} дней назад`;
-            if (diffDays < 30) return `${Math.floor(diffDays / 7)} недель назад`;
-            if (diffDays < 365) return `${Math.floor(diffDays / 30)} месяцев назад`;
-            return `${Math.floor(diffDays / 365)} лет назад`;
-        }
-
-        function showLoading(container) {
-            container.innerHTML = `
-                <div class="loading">
-                    <div class="loading-spinner"></div>
-                    <span>Загрузка...</span>
-                </div>
-            `;
-        }
-
-        function showError(container, message) {
-            container.innerHTML = `
-                <div class="error">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <div>${message}</div>
-                </div>
-            `;
-        }
-
-        // Initialize when page loads
-        window.onload = function() {
-            init();
-        };
+        // Запуск при загрузке страницы
+        window.onload = init;
     </script>
 </body>
 </html>

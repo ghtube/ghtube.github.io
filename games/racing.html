@@ -16,6 +16,7 @@
             background: linear-gradient(135deg, #1a2a6c, #9b59b6);
             font-family: Arial, sans-serif;
             color: white;
+            overflow: hidden;
         }
         
         .game-container {
@@ -42,6 +43,7 @@
             border: 3px solid white;
             border-radius: 10px;
             background: #2c3e50;
+            cursor: none;
         }
         
         .controls {
@@ -67,6 +69,12 @@
         .lap-counter {
             font-size: 1.5rem;
             margin-top: 10px;
+        }
+        
+        .focus-message {
+            color: #ffeb3b;
+            font-size: 0.9rem;
+            margin-top: 5px;
         }
     </style>
 </head>
@@ -95,6 +103,7 @@
             <p><strong>Управление:</strong></p>
             <p>Игрок 1: W/S/A/D | Игрок 2: Стрелки</p>
             <p>Пробел - пауза | R - рестарт</p>
+            <p class="focus-message">Кликните на игровое поле для активации управления</p>
         </div>
         
         <a href="../index.html" class="back-btn">← Назад к играм</a>
@@ -120,7 +129,7 @@
         const FRICTION = 0.05;
         const ROTATION_SPEED = 0.05;
 
-        // Трасса (координаты центральной линии)
+        // Трасса
         const track = [
             {x: 200, y: 100}, {x: 600, y: 100},
             {x: 700, y: 200}, {x: 700, y: 400},
@@ -167,6 +176,46 @@
             w: false, a: false, s: false, d: false,
             ArrowUp: false, ArrowLeft: false, ArrowDown: false, ArrowRight: false
         };
+
+        // Фокус на игре при клике
+        canvas.addEventListener('click', () => {
+            canvas.style.borderColor = '#00ff00';
+            setTimeout(() => {
+                canvas.style.borderColor = 'white';
+            }, 200);
+        });
+
+        // Предотвращение стандартного поведения для игровых клавиш
+        document.addEventListener('keydown', (e) => {
+            const gameKeys = [' ', 'r', 'w', 'a', 's', 'd', 
+                            'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+            
+            if (gameKeys.includes(e.key)) {
+                e.preventDefault();
+                
+                if (keys.hasOwnProperty(e.key)) {
+                    keys[e.key] = true;
+                }
+                
+                if (e.key === ' ') {
+                    gamePaused = !gamePaused;
+                }
+                
+                if (e.key === 'r') {
+                    resetGame();
+                }
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            const gameKeys = ['w', 'a', 's', 'd', 
+                            'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+            
+            if (gameKeys.includes(e.key)) {
+                e.preventDefault();
+                keys[e.key] = false;
+            }
+        });
 
         function drawTrack() {
             // Рисуем внешнюю границу
@@ -257,8 +306,7 @@
 
             // Проверка столкновения с границами
             if (!isOnTrack(car)) {
-                car.speed *= 0.7; // Замедление при столкновении
-                // Отталкивание от границы
+                car.speed *= 0.7;
                 car.x -= Math.sin(car.angle) * car.speed * 2;
                 car.y += Math.cos(car.angle) * car.speed * 2;
             }
@@ -268,7 +316,6 @@
         }
 
         function isOnTrack(car) {
-            // Упрощенная проверка нахождения на трассе
             const trackPoints = track;
             let minDistance = Infinity;
 
@@ -315,7 +362,6 @@
         }
 
         function checkCheckpoints(car) {
-            // Проверка пересечения стартовой линии
             if (car.x > 150 && car.x < 250 && car.y > 250 && car.y < 350) {
                 if (car.checkpoints === 8) {
                     car.lap++;
@@ -333,7 +379,6 @@
                 }
             }
 
-            // Упрощенные чекпоинты (углы трассы)
             const checkpoints = [
                 {x: 600, y: 100}, {x: 700, y: 200}, {x: 700, y: 400},
                 {x: 600, y: 500}, {x: 200, y: 500}, {x: 100, y: 400},
@@ -369,7 +414,6 @@
             speed1Element.textContent = Math.abs(Math.round(car1.speed * 20));
             speed2Element.textContent = Math.abs(Math.round(car2.speed * 20));
             
-            // Определение позиции
             const progress1 = car1.lap * 1000 + car1.checkpoints * 100 + 
                              (car1.x + car1.y) / 10;
             const progress2 = car2.lap * 1000 + car2.checkpoints * 100 + 
@@ -416,30 +460,6 @@
                 requestAnimationFrame(gameLoop);
             }
         }
-
-        // Обработка управления
-        document.addEventListener('keydown', (e) => {
-            if (keys.hasOwnProperty(e.key)) {
-                keys[e.key] = true;
-            }
-            
-            if (e.key === ' ') {
-                gamePaused = !gamePaused;
-                if (!gamePaused && !raceFinished) {
-                    gameLoop();
-                }
-            }
-            
-            if (e.key === 'r') {
-                resetGame();
-            }
-        });
-
-        document.addEventListener('keyup', (e) => {
-            if (keys.hasOwnProperty(e.key)) {
-                keys[e.key] = false;
-            }
-        });
 
         function resetGame() {
             car1.x = 150;

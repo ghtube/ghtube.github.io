@@ -16,6 +16,7 @@
             background: linear-gradient(135deg, #1a2a6c, #2980b9);
             font-family: Arial, sans-serif;
             color: white;
+            overflow: hidden;
         }
         
         .game-container {
@@ -42,6 +43,7 @@
             border: 3px solid white;
             border-radius: 10px;
             background: #000;
+            cursor: none;
         }
         
         .controls {
@@ -63,6 +65,12 @@
             text-decoration: none;
             display: inline-block;
         }
+        
+        .focus-message {
+            color: #ffeb3b;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -80,6 +88,7 @@
             <p><strong>Управление:</strong></p>
             <p>Игрок 1: W/S | Игрок 2: Стрелки вверх/вниз</p>
             <p>Пробел - пауза/старт | R - рестарт</p>
+            <p class="focus-message">Кликните на игровое поле для активации управления</p>
         </div>
         
         <a href="../index.html" class="back-btn">← Назад к играм</a>
@@ -107,6 +116,18 @@
         let score2 = 0;
         let gameRunning = false;
         let gamePaused = false;
+
+        // Фокус на игре при клике
+        canvas.addEventListener('click', () => {
+            canvas.style.borderColor = '#00ff00';
+            setTimeout(() => {
+                canvas.style.borderColor = 'white';
+            }, 200);
+            
+            if (!gameRunning) {
+                gameRunning = true;
+            }
+        });
 
         function draw() {
             // Очистка canvas
@@ -148,7 +169,7 @@
                 
                 ctx.fillStyle = 'white';
                 ctx.font = '30px Arial';
-                ctx.fillText('Нажми ПРОБЕЛ для начала игры', canvas.width / 2, canvas.height / 2);
+                ctx.fillText('Кликните на поле для начала игры', canvas.width / 2, canvas.height / 2);
             }
             
             if (gamePaused) {
@@ -180,9 +201,9 @@
                 ballY < player1Y + paddleHeight) {
                 
                 let deltaY = ballY - (player1Y + paddleHeight / 2);
-                ballSpeedX = Math.abs(ballSpeedX) + 0.5; // Увеличиваем скорость
+                ballSpeedX = Math.abs(ballSpeedX) + 0.5;
                 ballSpeedY = deltaY * 0.2;
-                ballX = paddleWidth + ballSize; // Исправляем позицию
+                ballX = paddleWidth + ballSize;
             }
             
             // Правая ракетка
@@ -191,9 +212,9 @@
                 ballY < player2Y + paddleHeight) {
                 
                 let deltaY = ballY - (player2Y + paddleHeight / 2);
-                ballSpeedX = -Math.abs(ballSpeedX) - 0.5; // Увеличиваем скорость
+                ballSpeedX = -Math.abs(ballSpeedX) - 0.5;
                 ballSpeedY = deltaY * 0.2;
-                ballX = canvas.width - paddleWidth - ballSize; // Исправляем позицию
+                ballX = canvas.width - paddleWidth - ballSize;
             }
             
             // Забитие гола
@@ -222,18 +243,19 @@
             requestAnimationFrame(gameLoop);
         }
 
-        // Управление
+        // Управление с предотвращением стандартного поведения
         const keys = {};
         
         document.addEventListener('keydown', (e) => {
+            const gameKeys = [' ', 'r', 'w', 's', 'ArrowUp', 'ArrowDown'];
+            if (gameKeys.includes(e.key)) {
+                e.preventDefault();
+            }
+            
             keys[e.key] = true;
             
             if (e.key === ' ') {
-                if (!gameRunning && !gamePaused) {
-                    gameRunning = true;
-                } else {
-                    gamePaused = !gamePaused;
-                }
+                gamePaused = !gamePaused;
             }
             
             if (e.key === 'r') {
@@ -246,6 +268,9 @@
         });
         
         document.addEventListener('keyup', (e) => {
+            if (['w', 's', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+                e.preventDefault();
+            }
             keys[e.key] = false;
         });
 

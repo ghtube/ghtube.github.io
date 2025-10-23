@@ -16,6 +16,7 @@
             background: linear-gradient(135deg, #1a2a6c, #b21f1f);
             font-family: Arial, sans-serif;
             color: white;
+            overflow: hidden;
         }
         
         .game-container {
@@ -42,6 +43,7 @@
             border: 3px solid white;
             border-radius: 10px;
             background: #000;
+            cursor: none;
         }
         
         .controls {
@@ -63,6 +65,12 @@
             text-decoration: none;
             display: inline-block;
         }
+        
+        .focus-message {
+            color: #ffeb3b;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -80,6 +88,7 @@
             <p><strong>Управление:</strong></p>
             <p>Игрок 1: WASD | Игрок 2: Стрелки</p>
             <p>Пробел - пауза | R - перезапуск</p>
+            <p class="focus-message">Кликните на игровое поле для активации управления</p>
         </div>
         
         <a href="../index.html" class="back-btn">← Назад к играм</a>
@@ -108,11 +117,21 @@
         ];
 
         let food = {x: 10, y: 10};
-        let dx1 = 1, dy1 = 0; // Направление змейки 1
-        let dx2 = -1, dy2 = 0; // Направление змейки 2
+        let dx1 = 1, dy1 = 0;
+        let dx2 = -1, dy2 = 0;
         let score1 = 0, score2 = 0;
         let gameRunning = true;
         let gamePaused = false;
+        let gameFocused = false;
+
+        // Фокус на игре при клике
+        canvas.addEventListener('click', () => {
+            gameFocused = true;
+            canvas.style.borderColor = '#00ff00';
+            setTimeout(() => {
+                canvas.style.borderColor = 'white';
+            }, 200);
+        });
 
         // Генерация еды
         function generateFood() {
@@ -121,7 +140,6 @@
                 y: Math.floor(Math.random() * tileCount)
             };
             
-            // Проверяем, чтобы еда не появилась на змейках
             for (let segment of snake1) {
                 if (segment.x === food.x && segment.y === food.y) {
                     return generateFood();
@@ -173,15 +191,12 @@
         }
 
         function moveSnakes() {
-            // Двигаем змейку 1
             const head1 = {x: snake1[0].x + dx1, y: snake1[0].y + dy1};
             snake1.unshift(head1);
             
-            // Двигаем змейку 2
             const head2 = {x: snake2[0].x + dx2, y: snake2[0].y + dy2};
             snake2.unshift(head2);
             
-            // Проверяем, съела ли змейка еду
             if (head1.x === food.x && head1.y === food.y) {
                 score1 += 10;
                 score1Element.textContent = score1;
@@ -203,7 +218,6 @@
             const head1 = snake1[0];
             const head2 = snake2[0];
             
-            // Проверка столкновения со стенами
             if (head1.x < 0 || head1.x >= tileCount || head1.y < 0 || head1.y >= tileCount) {
                 gameOver("Игрок 2");
                 return;
@@ -214,7 +228,6 @@
                 return;
             }
             
-            // Проверка столкновения с собой
             for (let i = 1; i < snake1.length; i++) {
                 if (head1.x === snake1[i].x && head1.y === snake1[i].y) {
                     gameOver("Игрок 2");
@@ -229,7 +242,6 @@
                 }
             }
             
-            // Проверка столкновения змеек друг с другом
             for (let segment of snake1) {
                 if (head2.x === segment.x && head2.y === segment.y) {
                     gameOver("Игрок 1");
@@ -259,8 +271,14 @@
             ctx.fillText('Нажми R для рестарта', canvas.width / 2, canvas.height / 2 + 40);
         }
 
-        // Управление
+        // Управление с предотвращением стандартного поведения
         document.addEventListener('keydown', (e) => {
+            // Предотвращаем стандартное поведение для игровых клавиш
+            const gameKeys = [' ', 'r', 'w', 'a', 's', 'd', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+            if (gameKeys.includes(e.key)) {
+                e.preventDefault();
+            }
+            
             if (!gameRunning && e.key === 'r') {
                 resetGame();
                 return;

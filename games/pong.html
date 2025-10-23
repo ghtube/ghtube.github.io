@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пинг-Понг</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a2a6c, #2980b9);
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+        
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .score-board {
+            display: flex;
+            gap: 50px;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .player-score {
+            padding: 10px 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        #gameCanvas {
+            border: 3px solid white;
+            border-radius: 10px;
+            background: #000;
+        }
+        
+        .controls {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+        
+        .back-btn {
+            padding: 10px 20px;
+            background: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+            text-decoration: none;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Пинг-Понг</h1>
+        
+        <div class="score-board">
+            <div class="player-score">Игрок 1: <span id="score1">0</span></div>
+            <div class="player-score">Игрок 2: <span id="score2">0</span></div>
+        </div>
+        
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+        
+        <div class="controls">
+            <p><strong>Управление:</strong></p>
+            <p>Игрок 1: W/S | Игрок 2: Стрелки вверх/вниз</p>
+            <p>Пробел - пауза/старт | R - рестарт</p>
+        </div>
+        
+        <a href="../index.html" class="back-btn">← Назад к играм</a>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const score1Element = document.getElementById('score1');
+        const score2Element = document.getElementById('score2');
+
+        // Игровые объекты
+        const paddleHeight = 100;
+        const paddleWidth = 10;
+        const ballSize = 10;
+        
+        let player1Y = canvas.height / 2 - paddleHeight / 2;
+        let player2Y = canvas.height / 2 - paddleHeight / 2;
+        let ballX = canvas.width / 2;
+        let ballY = canvas.height / 2;
+        let ballSpeedX = 5;
+        let ballSpeedY = 3;
+        
+        let score1 = 0;
+        let score2 = 0;
+        let gameRunning = false;
+        let gamePaused = false;
+
+        function draw() {
+            // Очистка canvas
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Рисуем центральную линию
+            ctx.setLineDash([5, 15]);
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2, 0);
+            ctx.lineTo(canvas.width / 2, canvas.height);
+            ctx.strokeStyle = 'white';
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // Рисуем ракетки
+            ctx.fillStyle = '#2ecc71';
+            ctx.fillRect(0, player1Y, paddleWidth, paddleHeight);
+            
+            ctx.fillStyle = '#3498db';
+            ctx.fillRect(canvas.width - paddleWidth, player2Y, paddleWidth, paddleHeight);
+            
+            // Рисуем мяч
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(ballX, ballY, ballSize, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Отображаем счет
+            ctx.font = '30px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(score1, canvas.width / 4, 50);
+            ctx.fillText(score2, 3 * canvas.width / 4, 50);
+            
+            // Сообщение о начале игры
+            if (!gameRunning) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = 'white';
+                ctx.font = '30px Arial';
+                ctx.fillText('Нажми ПРОБЕЛ для начала игры', canvas.width / 2, canvas.height / 2);
+            }
+            
+            if (gamePaused) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = 'white';
+                ctx.font = '30px Arial';
+                ctx.fillText('ПАУЗА', canvas.width / 2, canvas.height / 2);
+            }
+        }
+
+        function update() {
+            if (!gameRunning || gamePaused) return;
+            
+            // Двигаем мяч
+            ballX += ballSpeedX;
+            ballY += ballSpeedY;
+            
+            // Отскок от верхней и нижней стенки
+            if (ballY - ballSize < 0 || ballY + ballSize > canvas.height) {
+                ballSpeedY = -ballSpeedY;
+            }
+            
+            // Проверка столкновения с ракетками
+            // Левая ракетка
+            if (ballX - ballSize < paddleWidth && 
+                ballY > player1Y && 
+                ballY < player1Y + paddleHeight) {
+                
+                let deltaY = ballY - (player1Y + paddleHeight / 2);
+                ballSpeedX = Math.abs(ballSpeedX) + 0.5; // Увеличиваем скорость
+                ballSpeedY = deltaY * 0.2;
+                ballX = paddleWidth + ballSize; // Исправляем позицию
+            }
+            
+            // Правая ракетка
+            if (ballX + ballSize > canvas.width - paddleWidth && 
+                ballY > player2Y && 
+                ballY < player2Y + paddleHeight) {
+                
+                let deltaY = ballY - (player2Y + paddleHeight / 2);
+                ballSpeedX = -Math.abs(ballSpeedX) - 0.5; // Увеличиваем скорость
+                ballSpeedY = deltaY * 0.2;
+                ballX = canvas.width - paddleWidth - ballSize; // Исправляем позицию
+            }
+            
+            // Забитие гола
+            if (ballX < 0) {
+                score2++;
+                score2Element.textContent = score2;
+                resetBall();
+            } else if (ballX > canvas.width) {
+                score1++;
+                score1Element.textContent = score1;
+                resetBall();
+            }
+        }
+
+        function resetBall() {
+            ballX = canvas.width / 2;
+            ballY = canvas.height / 2;
+            ballSpeedX = (Math.random() > 0.5 ? 1 : -1) * 5;
+            ballSpeedY = (Math.random() * 4 - 2);
+            gameRunning = false;
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Управление
+        const keys = {};
+        
+        document.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+            
+            if (e.key === ' ') {
+                if (!gameRunning && !gamePaused) {
+                    gameRunning = true;
+                } else {
+                    gamePaused = !gamePaused;
+                }
+            }
+            
+            if (e.key === 'r') {
+                score1 = 0;
+                score2 = 0;
+                score1Element.textContent = '0';
+                score2Element.textContent = '0';
+                resetBall();
+            }
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            keys[e.key] = false;
+        });
+
+        function handleInput() {
+            // Игрок 1 (W/S)
+            if (keys['w'] && player1Y > 0) {
+                player1Y -= 7;
+            }
+            if (keys['s'] && player1Y < canvas.height - paddleHeight) {
+                player1Y += 7;
+            }
+            
+            // Игрок 2 (Стрелки вверх/вниз)
+            if (keys['ArrowUp'] && player2Y > 0) {
+                player2Y -= 7;
+            }
+            if (keys['ArrowDown'] && player2Y < canvas.height - paddleHeight) {
+                player2Y += 7;
+            }
+        }
+
+        function inputLoop() {
+            handleInput();
+            requestAnimationFrame(inputLoop);
+        }
+
+        // Запуск игровых циклов
+        gameLoop();
+        inputLoop();
+    </script>
+</body>
+</html>

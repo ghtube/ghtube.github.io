@@ -43,7 +43,6 @@
             border: 3px solid white;
             border-radius: 10px;
             background: #000;
-            cursor: none;
         }
         
         .controls {
@@ -66,10 +65,10 @@
             display: inline-block;
         }
         
-        .focus-message {
+        .start-message {
             color: #ffeb3b;
-            font-size: 0.9rem;
-            margin-top: 5px;
+            font-size: 1.2rem;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -84,11 +83,12 @@
         
         <canvas id="gameCanvas" width="600" height="400"></canvas>
         
+        <div class="start-message" id="startMessage">Нажми SPACE для начала игры!</div>
+        
         <div class="controls">
             <p><strong>Управление:</strong></p>
             <p>Игрок 1: WASD | Игрок 2: Стрелки</p>
-            <p>Пробел - пауза | R - перезапуск</p>
-            <p class="focus-message">Кликните на игровое поле для активации управления</p>
+            <p>SPACE - пауза | R - перезапуск</p>
         </div>
         
         <a href="../index.html" class="back-btn">← Назад к играм</a>
@@ -99,11 +99,11 @@
         const ctx = canvas.getContext('2d');
         const score1Element = document.getElementById('score1');
         const score2Element = document.getElementById('score2');
+        const startMessage = document.getElementById('startMessage');
 
         const gridSize = 20;
         const tileCount = canvas.width / gridSize;
 
-        // Змейки
         let snake1 = [
             {x: 5, y: 10},
             {x: 4, y: 10},
@@ -120,20 +120,12 @@
         let dx1 = 1, dy1 = 0;
         let dx2 = -1, dy2 = 0;
         let score1 = 0, score2 = 0;
-        let gameRunning = true;
+        let gameRunning = false;
         let gamePaused = false;
-        let gameFocused = false;
 
-        // Фокус на игре при клике
-        canvas.addEventListener('click', () => {
-            gameFocused = true;
-            canvas.style.borderColor = '#00ff00';
-            setTimeout(() => {
-                canvas.style.borderColor = 'white';
-            }, 200);
-        });
+        // Управление
+        const keys = {};
 
-        // Генерация еды
         function generateFood() {
             food = {
                 x: Math.floor(Math.random() * tileCount),
@@ -152,7 +144,6 @@
             }
         }
 
-        // Основной игровой цикл
         function gameLoop() {
             if (!gameRunning || gamePaused) return;
             
@@ -172,13 +163,11 @@
         }
 
         function drawSnakes() {
-            // Рисуем змейку 1 (зеленая)
             ctx.fillStyle = '#2ecc71';
             for (let segment of snake1) {
                 ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize - 2, gridSize - 2);
             }
             
-            // Рисуем змейку 2 (синяя)
             ctx.fillStyle = '#3498db';
             for (let segment of snake2) {
                 ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize - 2, gridSize - 2);
@@ -271,25 +260,30 @@
             ctx.fillText('Нажми R для рестарта', canvas.width / 2, canvas.height / 2 + 40);
         }
 
-        // Управление с предотвращением стандартного поведения
+        // Обработка управления
         document.addEventListener('keydown', (e) => {
-            // Предотвращаем стандартное поведение для игровых клавиш
-            const gameKeys = [' ', 'r', 'w', 'a', 's', 'd', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+            const gameKeys = [' ', 'r', 'w', 'a', 's', 'd', 'e', 'l', 
+                            'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+            
             if (gameKeys.includes(e.key)) {
                 e.preventDefault();
             }
             
-            if (!gameRunning && e.key === 'r') {
-                resetGame();
-                return;
-            }
+            keys[e.key] = true;
             
-            if (e.key === ' ') {
+            if (e.key === ' ' && !gameRunning) {
+                gameRunning = true;
+                startMessage.style.display = 'none';
+                gameLoop();
+            } else if (e.key === ' ' && gameRunning) {
                 gamePaused = !gamePaused;
-                if (!gamePaused && gameRunning) {
+                if (!gamePaused) {
                     gameLoop();
                 }
-                return;
+            }
+            
+            if (e.key === 'r') {
+                resetGame();
             }
             
             // Управление змейкой 1 (WASD)
@@ -315,6 +309,14 @@
             }
         });
 
+        document.addEventListener('keyup', (e) => {
+            if (['w', 'a', 's', 'd', 'e', 'l', 
+                'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                e.preventDefault();
+            }
+            keys[e.key] = false;
+        });
+
         function resetGame() {
             snake1 = [
                 {x: 5, y: 10},
@@ -333,15 +335,32 @@
             score1 = 0; score2 = 0;
             score1Element.textContent = '0';
             score2Element.textContent = '0';
-            gameRunning = true;
+            gameRunning = false;
             gamePaused = false;
+            startMessage.style.display = 'block';
             generateFood();
-            gameLoop();
+            draw();
         }
 
-        // Запуск игры
+        function draw() {
+            clearCanvas();
+            drawFood();
+            drawSnakes();
+            
+            if (!gameRunning) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = 'white';
+                ctx.font = '30px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('Нажми SPACE для начала', canvas.width / 2, canvas.height / 2);
+            }
+        }
+
+        // Инициализация
         generateFood();
-        gameLoop();
+        draw();
     </script>
 </body>
 </html>

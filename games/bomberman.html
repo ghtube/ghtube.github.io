@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бомбермен на двоих</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a2a6c, #e74c3c);
+            font-family: Arial, sans-serif;
+            color: white;
+            overflow: hidden;
+        }
+        
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .game-info {
+            display: flex;
+            gap: 50px;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .player-info {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        #gameCanvas {
+            border: 3px solid white;
+            border-radius: 10px;
+            background: #2c3e50;
+        }
+        
+        .controls {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+        
+        .back-btn {
+            padding: 10px 20px;
+            background: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .start-message {
+            color: #ffeb3b;
+            font-size: 1.2rem;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Бомбермен на двоих</h1>
+        
+        <div class="game-info">
+            <div class="player-info">
+                <div>Игрок 1: <span id="score1">0</span></div>
+                <div>Бомбы: <span id="bombs1">1</span></div>
+            </div>
+            <div class="player-info">
+                <div>Игрок 2: <span id="score2">0</span></div>
+                <div>Бомбы: <span id="bombs2">1</span></div>
+            </div>
+        </div>
+        
+        <canvas id="gameCanvas" width="600" height="600"></canvas>
+        
+        <div class="start-message" id="startMessage">Нажми SPACE для начала игры!</div>
+        
+        <div class="controls">
+            <p><strong>Управление:</strong></p>
+            <p>Игрок 1: WASD (движение), E (бомба)</p>
+            <p>Игрок 2: Стрелки (движение), L (бомба)</p>
+            <p>SPACE - пауза | R - перезапуск</p>
+        </div>
+        
+        <a href="../index.html" class="back-btn">← Назад к играм</a>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const score1Element = document.getElementById('score1');
+        const score2Element = document.getElementById('score2');
+        const bombs1Element = document.getElementById('bombs1');
+        const bombs2Element = document.getElementById('bombs2');
+        const startMessage = document.getElementById('startMessage');
+
+        const gridSize = 40;
+        const playerSize = gridSize * 0.8; // 80% от размера клетки
+        const playerSpeed = 3; // Нормальная скорость
+
+        // Игровые объекты
+        let player1 = { 
+            x: gridSize + playerSize/2, 
+            y: gridSize + playerSize/2, 
+            bombs: 1, 
+            maxBombs: 1, 
+            score: 0, 
+            alive: true 
+        };
+        
+        let player2 = { 
+            x: (Math.floor(canvas.width/gridSize)-2) * gridSize + playerSize/2, 
+            y: (Math.floor(canvas.height/gridSize)-2) * gridSize + playerSize/2, 
+            bombs: 1, 
+            maxBombs: 1, 
+            score: 0, 
+            alive: true 
+        };
+        
+        let bombs = [];
+        let explosions = [];
+        let walls = [];
+        let crates = [];
+
+        let gameRunning = false;
+        let gamePaused = false;
+
+        // Создание уровня
+        function createLevel() {
+            walls.length = 0;
+            crates.length = 0;
+            
+            const cols = Math.floor(canvas.width / gridSize);
+            const rows = Math.floor(canvas.height / gridSize);
+            
+            // Границы
+            for (let i = 0; i < cols; i++) {
+                walls.push({x: i * gridSize, y: 0, width: gridSize, height: gridSize});
+                walls.push({x: i * gridSize, y: (rows-1) * gridSize, width: gridSize, height: gridSize});
+            }
+            for (let i = 0; i < rows; i++) {
+                walls.push({x: 0, y: i * gridSize, width: gridSize, height: gridSize});
+                walls.push({x: (cols-1) * gridSize, y: i * gridSize, width: gridSize, height: gridSize});
+            }
+            
+            // Решетка стен
+            for (let y = 2; y < rows - 2; y += 2) {
+                for (let x = 2; x < cols - 2; x += 2) {
+                    walls.push({x: x * gridSize, y: y * gridSize, width: gridSize, height: gridSize});
+                }
+            }
+            
+            // Ящики (случайное размещение)
+            for (let y = 1; y < rows - 1; y++) {
+                for (let x = 1; x < cols - 1; x++) {
+                    const isWall = walls.some(w => 
+                        w.x === x * gridSize && w.y === y * gridSize
+                    );
+                    const isPlayer1Start = x === 1 && y === 1;
+                    const isPlayer2Start = x === cols-2 && y === rows-2;
+                    
+                    if (!isWall && !isPlayer1Start && !isPlayer2Start && Math.random() > 0.4) {
+                        crates.push({x: x * gridSize, y: y * gridSize, width: gridSize, height: gridSize});
+                    }
+                }
+            }
+        }
+
+        // Управление
+        const keys = {};
+
+        function gameLoop() {
+            if (!gameRunning || gamePaused) return;
+            
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function update() {
+            // Движение игроков
+            movePlayer(player1, 'w', 'a', 's', 'd');
+            movePlayer(player2, 'ArrowUp', 'ArrowLeft', 'ArrowDown', 'ArrowRight');
+            
+            // Обновление бомб
+            updateBombs();
+            
+            // Обновление взрывов
+            updateExplosions();
+            
+            // Проверка условий победы
+            if (!player1.alive && !player2.alive) {
+                gameOver("Ничья!");
+            } else if (!player1.alive) {
+                gameOver("Победил Игрок 2!");
+            } else if (!player2.alive) {
+                gameOver("Победил Игрок 1!");
+            }
+        }
+
+        function movePlayer(player, up, left, down, right) {
+            if (!player.alive) return;
+            
+            let newX = player.x;
+            let newY = player.y;
+            
+            if (keys[up]) newY -= playerSpeed;
+            if (keys[down]) newY += playerSpeed;
+            if (keys[left]) newX -= playerSpeed;
+            if (keys[right]) newX += playerSpeed;
+            
+            // Проверка столкновений
+            if (!isCollision(newX, newY, player)) {
+                player.x = newX;
+                player.y = newY;
+            }
+            
+            // Установка бомбы
+            if (((keys['e'] && player === player1) || (keys['l'] && player === player2)) && player.bombs > 0) {
+                placeBomb(player);
+            }
+        }
+
+        function placeBomb(player) {
+            const gridX = Math.round((player.x - playerSize/2) / gridSize) * gridSize;
+            const gridY = Math.round((player.y - playerSize/2) / gridSize) * gridSize;
+            
+            if (bombs.some(b => b.x === gridX && b.y === gridY)) return;
+            
+            bombs.push({
+                x: gridX,
+                y: gridY,
+                player: player,
+                timer: 180 // 3 секунды при 60 FPS
+            });
+            player.bombs--;
+            updateBombCounters();
+        }
+
+        function updateBombs() {
+            for (let i = bombs.length - 1; i >= 0; i--) {
+                bombs[i].timer--;
+                
+                if (bombs[i].timer <= 0) {
+                    explodeBomb(bombs[i]);
+                    bombs.splice(i, 1);
+                }
+            }
+        }
+
+        function explodeBomb(bomb) {
+            bomb.player.bombs++;
+            updateBombCounters();
+            
+            explosions.push({ x: bomb.x, y: bomb.y, timer: 30 });
+            
+            // Взрыв в 4 направлениях
+            const directions = [[0, -gridSize], [gridSize, 0], [0, gridSize], [-gridSize, 0]];
+            
+            for (let [dx, dy] of directions) {
+                for (let i = 1; i <= 2; i++) {
+                    const x = bomb.x + dx * i;
+                    const y = bomb.y + dy * i;
+                    
+                    // Проверка на стену
+                    if (walls.some(w => w.x === x && w.y === y)) break;
+                    
+                    explosions.push({ x, y, timer: 30 });
+                    
+                    // Уничтожение ящиков
+                    const crateIndex = crates.findIndex(c => c.x === x && c.y === y);
+                    if (crateIndex !== -1) {
+                        crates.splice(crateIndex, 1);
+                        bomb.player.score += 10;
+                        updateScores();
+                    }
+                    
+                    // Проверка попадания по игрокам
+                    checkPlayerHit(player1, x, y);
+                    checkPlayerHit(player2, x, y);
+                }
+            }
+        }
+
+        function checkPlayerHit(player, x, y) {
+            if (player.alive && 
+                player.x > x && player.x < x + gridSize &&
+                player.y > y && player.y < y + gridSize) {
+                player.alive = false;
+            }
+        }
+
+        function updateExplosions() {
+            for (let i = explosions.length - 1; i >= 0; i--) {
+                explosions[i].timer--;
+                if (explosions[i].timer <= 0) {
+                    explosions.splice(i, 1);
+                }
+            }
+        }
+
+        function isCollision(x, y, player) {
+            const playerLeft = x - playerSize/2;
+            const playerRight = x + playerSize/2;
+            const playerTop = y - playerSize/2;
+            const playerBottom = y + playerSize/2;
+            
+            // Проверка стен
+            for (let wall of walls) {
+                if (playerRight > wall.x && playerLeft < wall.x + wall.width &&
+                    playerBottom > wall.y && playerTop < wall.y + wall.height) {
+                    return true;
+                }
+            }
+            
+            // Проверка ящиков
+            for (let crate of crates) {
+                if (playerRight > crate.x && playerLeft < crate.x + crate.width &&
+                    playerBottom > crate.y && playerTop < crate.y + crate.height) {
+                    return true;
+                }
+            }
+            
+            // Проверка бомб (кроме своей текущей позиции)
+            for (let bomb of bombs) {
+                const bombGridX = bomb.x;
+                const bombGridY = bomb.y;
+                const currentPlayerGridX = Math.round((player.x - playerSize/2) / gridSize) * gridSize;
+                const currentPlayerGridY = Math.round((player.y - playerSize/2) / gridSize) * gridSize;
+                
+                if (!(currentPlayerGridX === bombGridX && currentPlayerGridY === bombGridY) &&
+                    playerRight > bombGridX && playerLeft < bombGridX + gridSize &&
+                    playerBottom > bombGridY && playerTop < bombGridY + gridSize) {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+
+        function updateBombCounters() {
+            bombs1Element.textContent = player1.bombs;
+            bombs2Element.textContent = player2.bombs;
+        }
+
+        function updateScores() {
+            score1Element.textContent = player1.score;
+            score2Element.textContent = player2.score;
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Рисуем пол
+            ctx.fillStyle = '#34495e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Рисуем сетку
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            for (let x = 0; x < canvas.width; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            for (let y = 0; y < canvas.height; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+            
+            // Рисуем стены
+            ctx.fillStyle = '#7f8c8d';
+            for (let wall of walls) {
+                ctx.fillRect(wall.x, wall.y, wall.width, wall.height);
+            }
+            
+            // Рисуем ящики
+            ctx.fillStyle = '#d35400';
+            for (let crate of crates) {
+                ctx.fillRect(crate.x, crate.y, crate.width, crate.height);
+                ctx.strokeStyle = '#e67e22';
+                ctx.strokeRect(crate.x, crate.y, crate.width, crate.height);
+            }
+            
+            // Рисуем бомбы
+            ctx.fillStyle = '#2c3e50';
+            for (let bomb of bombs) {
+                ctx.beginPath();
+                ctx.arc(bomb.x + gridSize/2, bomb.y + gridSize/2, gridSize/3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Рисуем взрывы
+            for (let explosion of explosions) {
+                const alpha = explosion.timer / 30;
+                ctx.fillStyle = `rgba(255, ${100 + explosion.timer * 5}, 0, ${alpha})`;
+                ctx.fillRect(explosion.x, explosion.y, gridSize, gridSize);
+            }
+            
+            // Рисуем игроков
+            if (player1.alive) {
+                ctx.fillStyle = '#2ecc71';
+                ctx.beginPath();
+                ctx.arc(player1.x, player1.y, playerSize/2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            if (player2.alive) {
+                ctx.fillStyle = '#3498db';
+                ctx.beginPath();
+                ctx.arc(player2.x, player2.y, playerSize/2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Сообщения
+            if (!gameRunning) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = 'white';
+                ctx.font = '30px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('Нажми SPACE для начала', canvas.width / 2, canvas.height / 2);
+            }
+        }
+
+        function gameOver(message) {
+            gameRunning = false;
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = 'white';
+            ctx.font = '30px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(message, canvas.width / 2, canvas.height / 2);
+            
+            ctx.font = '20px Arial';
+            ctx.fillText('Нажми SPACE для новой игры', canvas.width / 2, canvas.height / 2 + 50);
+        }
+
+        // Обработка управления
+        document.addEventListener('keydown', (e) => {
+            const gameKeys = [' ', 'r', 'w', 'a', 's', 'd', 'e', 'l', 
+                            'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+            
+            if (gameKeys.includes(e.key)) {
+                e.preventDefault();
+            }
+            
+            keys[e.key] = true;
+            
+            if (e.key === ' ' && !gameRunning) {
+                startGame();
+            } else if (e.key === ' ' && gameRunning) {
+                gamePaused = !gamePaused;
+                if (!gamePaused) {
+                    gameLoop();
+                }
+            }
+            
+            if (e.key === 'r') {
+                resetGame();
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (['w', 'a', 's', 'd', 'e', 'l', 
+                'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                e.preventDefault();
+            }
+            keys[e.key] = false;
+        });
+
+        function startGame() {
+            gameRunning = true;
+            startMessage.style.display = 'none';
+            gameLoop();
+        }
+
+        function resetGame() {
+            player1 = { 
+                x: gridSize + playerSize/2, 
+                y: gridSize + playerSize/2, 
+                bombs: 1, 
+                maxBombs: 1, 
+                score: 0, 
+                alive: true 
+            };
+            player2 = { 
+                x: (Math.floor(canvas.width/gridSize)-2) * gridSize + playerSize/2, 
+                y: (Math.floor(canvas.height/gridSize)-2) * gridSize + playerSize/2, 
+                bombs: 1, 
+                maxBombs: 1, 
+                score: 0, 
+                alive: true 
+            };
+            bombs = [];
+            explosions = [];
+            score1Element.textContent = '0';
+            score2Element.textContent = '0';
+            bombs1Element.textContent = '1';
+            bombs2Element.textContent = '1';
+            gameRunning = false;
+            gamePaused = false;
+            startMessage.style.display = 'block';
+            createLevel();
+            draw();
+        }
+
+        // Инициализация
+        createLevel();
+        draw();
+    </script>
+</body>
+</html>

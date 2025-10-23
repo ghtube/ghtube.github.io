@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Скачать презентацию</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+            background-color: #f5f5f5;
+        }
+        
+        .download-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 20px 0;
+        }
+        
+        .download-btn:hover {
+            background-color: #0056b3;
+        }
+        
+        .download-btn:active {
+            transform: translateY(2px);
+        }
+        
+        .info {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="info">
+        <h1>Презентация для скачивания</h1>
+        <p>Нажмите на кнопку ниже, чтобы скачать файл презентации.</p>
+        
+        <button class="download-btn" onclick="downloadFile()">
+            📥 Скачать present.pptx
+        </button>
+        
+        <p>Размер файла: <span id="fileSize">-</span></p>
+    </div>
+
+    <script>
+        // Функция для скачивания файла
+        function downloadFile() {
+            // Создаем ссылку для скачивания
+            const link = document.createElement('a');
+            link.href = 'present.pptx';
+            link.download = 'present.pptx';
+            
+            // Программно кликаем по ссылке
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Можно добавить дополнительное логирование
+            console.log('Начато скачивание файла: present.pptx');
+        }
+
+        // Опционально: показываем размер файла
+        window.addEventListener('load', function() {
+            fetch('present.pptx')
+                .then(response => {
+                    if (response.ok) {
+                        const size = response.headers.get('content-length');
+                        if (size) {
+                            const sizeInMB = (size / (1024 * 1024)).toFixed(2);
+                            document.getElementById('fileSize').textContent = sizeInMB + ' MB';
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.log('Не удалось определить размер файла');
+                });
+        });
+    </script>
+</body>
+</html>
